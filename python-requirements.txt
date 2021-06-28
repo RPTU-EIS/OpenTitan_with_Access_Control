@@ -1,0 +1,57 @@
+# Copyright lowRISC contributors.
+# Licensed under the Apache License, Version 2.0, see LICENSE for details.
+# SPDX-License-Identifier: Apache-2.0
+
+# Keep sorted.
+anytree # dependency of sw/host/vendor/google_verible_verilog_syntax_py
+enlighten
+flake8
+gitpython
+hjson
+ipyxact >= 0.2.4
+isort
+libcst
+livereload
+mako
+meson >= 0.53.0, <= 0.54 # minimum matches version in meson.build
+mistletoe>=0.7.2
+mypy
+# Premailer 3.9.0 broke the API by introducing an allow_loading_external_files
+# argument that is now mandatory, but didn't exist in previous versions.
+# To relax the constraint we either need to do a runtime detection, or switch all
+# users to a newer version.
+premailer < 3.9.0
+pyelftools
+pyftdi
+pyserial
+pygments
+pytest
+pytest-timeout
+pyyaml
+tabulate
+yapf
+
+# Type stubs for mypy checking. types-dataclasses is only needed for Python <= 3.6.
+types-dataclasses
+types-pkg_resources
+types-pyyaml
+types-tabulate
+
+# Development version with OT-specific changes
+git+https://github.com/lowRISC/fusesoc.git@ot#egg=fusesoc >= 1.11.0
+
+# Development version with OT-specific changes
+git+https://github.com/lowRISC/edalize.git@ot#egg=edalize >= 0.2.0
+
+# Development version of ChipWhisperer toolchain
+# Use a development version until support for the CW310 board works in a
+# released version.
+# Prefer the archive download over a git clone to decrease installation time
+# (The chipwhisperer repository is rather large and uses additionally uses
+# submodules, which need to be fetched as well.)
+https://github.com/newaetech/chipwhisperer/archive/9b6825b495f14f85aae8b11007c63c59a1654584.tar.gz
+
+# Development version with OT-specific changes
+# TODO(#6694): this is temporary and should be replaced with the standard package release,
+# once the cSHAKE patches have landed upstream.
+git+https://github.com/lowRISC/pycryptodome.git@master#egg=pycryptodome >= 3.10.1
