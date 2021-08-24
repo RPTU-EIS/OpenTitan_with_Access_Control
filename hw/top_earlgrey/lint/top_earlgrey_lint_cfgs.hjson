@@ -191,6 +191,11 @@
                   import_cfgs: ["{proj_root}/hw/lint/tools/dvsim/common_lint_cfg.hjson"]
                   rel_path: "hw/ip/rv_core_ibex/lint/{tool}"
              },
+             {    name: untrusted_device
+                  fusesoc_core: lowrisc:ip:untrusted_device
+                  import_cfgs: ["{proj_root}/hw/lint/tools/dvsim/common_lint_cfg.hjson"]
+                  rel_path: "hw/ip/untrusted_device/lint/{tool}"
+             },
              {    name: rv_dm
                   fusesoc_core: lowrisc:ip:rv_dm
                   import_cfgs: ["{proj_root}/hw/lint/tools/dvsim/common_lint_cfg.hjson"]
@@ -272,6 +277,11 @@
                   import_cfgs: ["{proj_root}/hw/lint/tools/dvsim/common_lint_cfg.hjson"]
                   rel_path: "hw/ip/tlul/adapter_sram/lint/{tool}"
              },
+             {    name: adapter_slave
+                  fusesoc_core: lowrisc:tlul:adapter_slave
+                  import_cfgs: ["{proj_root}/hw/lint/tools/dvsim/common_lint_cfg.hjson"]
+                  rel_path: "hw/ip/tlul/adapter_slave/lint/{tool}"
+             },
              {    name: sensor_ctrl
                   fusesoc_core: lowrisc:systems:sensor_ctrl
                   import_cfgs: ["{proj_root}/hw/lint/tools/dvsim/common_lint_cfg.hjson"]
@@ -281,6 +291,11 @@
                   fusesoc_core: lowrisc:tlul:sram2tlul
                   import_cfgs: ["{proj_root}/hw/lint/tools/dvsim/common_lint_cfg.hjson"]
                   rel_path: "hw/ip/tlul/sram2tlul/lint/{tool}"
+             },
+             {    name: bus_ctrl
+                  fusesoc_core: lowrisc:ip:bus_ctrl
+                  import_cfgs: ["{proj_root}/hw/lint/tools/dvsim/common_lint_cfg.hjson"]
+                  rel_path: "hw/ip/bus_ctrl/lint/{tool}"
              },
              {    name: top_earlgrey
                   fusesoc_core: lowrisc:systems:top_earlgrey

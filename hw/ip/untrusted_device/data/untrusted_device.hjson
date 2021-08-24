@@ -1,0 +1,23 @@
+// Copyright lowRISC contributors.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+{ name: "programmable_device",
+  clock_primary: "clk_i",
+  bus_device: "tlul",
+  bus_host: "tlul",
+  regwidth: "32",
+  available_input_list: [
+      {name: "test_en_i", desc: "enable all clock gates for testing"}
+      {name: "hart_id_i", desc: "", width: "32"}
+      {name: "boot_addr_i", desc: "", width: "32"}
+      {name: "irq_software_i", desc: ""}
+      {name: "irq_timer_i", desc: ""}
+      {name: "irq_external_i", desc: ""}
+      {name: "irq_fast_i", desc: "", width: "15"}
+      {name: "debug_req_i", desc: ""}
+      {name: "fetch_enable_i", desc: ""}
+      {name: "core_sleep_o", desc: ""}
+
+  ]
+  registers: [  ]
+}
