@@ -10,4 +10,6 @@ MEMORY {
   ram_main(rw) : ORIGIN = 0x10000000, LENGTH = 0x20000
   ram_ret_aon(rw) : ORIGIN = 0x40600000, LENGTH = 0x1000
   eflash(rx) : ORIGIN = 0x20000000, LENGTH = 0x100000
+  untrusted_rom (rx) : ORIGIN = 0x0, LENGTH = 0x4000
+  untrusted_ram (rw) : ORIGIN = 0x50000000, LENGTH = 0x20000
 }

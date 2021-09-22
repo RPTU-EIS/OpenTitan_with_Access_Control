@@ -23,7 +23,8 @@ tl_device_t xbar_devices[$] = '{
         '{32'h20000000, 32'h200fffff}
     }},
     '{"peri", '{
-        '{32'h40000000, 32'h407fffff}
+        '{32'h40000000, 32'h401fffff},
+        '{32'h40400000, 32'h407fffff}
     }},
     '{"flash_ctrl__core", '{
         '{32'h41000000, 32'h41000fff}
@@ -63,6 +64,12 @@ tl_device_t xbar_devices[$] = '{
     }},
     '{"sram_ctrl_main", '{
         '{32'h411c0000, 32'h411c0fff}
+    }},
+    '{"bus_ctrl", '{
+        '{32'h30000000, 32'h30000fff}
+    }},
+    '{"untrusted_s", '{
+        '{32'h40300000, 32'h40300fff}
 }}};
 
   // List of Xbar hosts
@@ -92,11 +99,33 @@ tl_host_t xbar_hosts[$] = '{
         "otbn",
         "keymgr",
         "kmac",
-        "sram_ctrl_main"}}
+        "sram_ctrl_main",
+        "bus_ctrl",
+        "untrusted_s"}}
     ,
     '{"dm_sba", 2, '{
         "rom_ctrl__rom",
         "rom_ctrl__regs",
+        "ram_main",
+        "eflash",
+        "peri",
+        "flash_ctrl__core",
+        "flash_ctrl__prim",
+        "aes",
+        "entropy_src",
+        "csrng",
+        "edn0",
+        "edn1",
+        "hmac",
+        "rv_plic",
+        "otbn",
+        "keymgr",
+        "kmac",
+        "sram_ctrl_main",
+        "bus_ctrl",
+        "untrusted_s"}}
+    ,
+    '{"untrusted_m", 3, '{
         "ram_main",
         "eflash",
         "peri",

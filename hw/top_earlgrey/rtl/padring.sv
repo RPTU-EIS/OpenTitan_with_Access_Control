@@ -7,7 +7,7 @@
 // to the MIOs/DIOs and pad attributes coming from the pinmux block.
 //
 
-`include "prim_assert.sv"
+`include "../../ip/prim/rtl/prim_assert.sv"
 
 module padring
   import prim_pad_wrapper_pkg::*;

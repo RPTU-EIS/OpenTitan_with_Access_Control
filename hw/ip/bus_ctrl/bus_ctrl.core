@@ -7,9 +7,9 @@ description: "Bus Access Controller"
 filesets:
   files_rtl:
     depend:
-      - lowrisc:top_earlgrey:xbar_main
       - lowrisc:tlul:headers
     files:
+      - rtl/bus_ctrl_pkg.sv
       - rtl/bus_ctrl.sv
     file_type: systemVerilogSource
 

@@ -1,0 +1,4 @@
+./vendor/lowrisc_ibex/rtl/ibex_wb_stage.sv:15:`include "unnecessary_files/dv/sv/dv_utils/dv_fcov_macros.svh"
+./vendor/lowrisc_ibex/rtl/ibex_load_store_unit.sv:15:`include "unnecessary_files/dv/sv/dv_utils/dv_fcov_macros.svh"
+./vendor/lowrisc_ibex/rtl/ibex_controller.sv:11:`include "unnecessary_files/dv/sv/dv_utils/dv_fcov_macros.svh"
+./vendor/lowrisc_ibex/rtl/ibex_id_stage.sv:18:`include "unnecessary_files/dv/sv/dv_utils/dv_fcov_macros.svh"

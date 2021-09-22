@@ -663,7 +663,9 @@ def find_otherside_modules(topcfg: OrderedDict, m,
         ('main', 'tl_cored'): ('rv_core_ibex', 'tl_d'),
         ('main', 'tl_dm_sba'): ('dm_top', 'tl_h'),
         ('main', 'tl_debug_mem'): ('dm_top', 'tl_d'),
-        ('peri', 'tl_ast'): ('ast', 'tl')
+        ('peri', 'tl_ast'): ('ast', 'tl'),
+        ('main', 'tl_untrusted_m'): ('untrusted_device', 'tl_d'),
+        ('main', 'tl_untrusted_s'): ('untrusted_device', 'tl_s')
     }
     special_result = special_inst_names.get((m, s))
     if special_result is not None:

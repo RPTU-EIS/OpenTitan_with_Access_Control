@@ -61,6 +61,12 @@ tl_device_t xbar_devices[$] = '{
     '{"sram_ctrl_main", '{
         '{32'h411c0000, 32'h411c0fff}
     }},
+    '{"bus_ctrl", '{
+        '{32'h30000000, 32'h30000fff}
+    }},
+    '{"untrusted_s", '{
+        '{32'h40300000, 32'h40300fff}
+    }},
     '{"uart0", '{
         '{32'h40000000, 32'h40000fff}
     }},
@@ -204,11 +210,61 @@ tl_host_t xbar_hosts[$] = '{
         "otbn",
         "keymgr",
         "kmac",
-        "sram_ctrl_main"}}
+        "sram_ctrl_main",
+        "bus_ctrl",
+        "untrusted_s"}}
     ,
     '{"dm_sba", 2, '{
         "rom_ctrl.rom",
         "rom_ctrl.regs",
+        "ram_main",
+        "eflash",
+        "uart0",
+        "uart1",
+        "uart2",
+        "uart3",
+        "i2c0",
+        "i2c1",
+        "i2c2",
+        "pattgen",
+        "gpio",
+        "spi_device",
+        "spi_host0",
+        "spi_host1",
+        "rv_timer",
+        "usbdev",
+        "pwrmgr_aon",
+        "rstmgr_aon",
+        "clkmgr_aon",
+        "pinmux_aon",
+        "ram_ret_aon",
+        "otp_ctrl",
+        "lc_ctrl",
+        "sensor_ctrl_aon",
+        "alert_handler",
+        "ast",
+        "sram_ctrl_ret_aon",
+        "aon_timer_aon",
+        "adc_ctrl_aon",
+        "sysrst_ctrl_aon",
+        "pwm_aon",
+        "flash_ctrl.core",
+        "flash_ctrl.prim",
+        "aes",
+        "entropy_src",
+        "csrng",
+        "edn0",
+        "edn1",
+        "hmac",
+        "rv_plic",
+        "otbn",
+        "keymgr",
+        "kmac",
+        "sram_ctrl_main",
+        "bus_ctrl",
+        "untrusted_s"}}
+    ,
+    '{"untrusted_m", 3, '{
         "ram_main",
         "eflash",
         "uart0",

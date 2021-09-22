@@ -4,7 +4,7 @@
 
 // A formal testbench for the ICache. This gets bound into the actual ICache DUT.
 
-`include "prim_assert.sv"
+`include "../../prim/rtl/prim_assert.sv"
 
 // A macro to emulate |-> (a syntax that Yosys doesn't currently support).
 `define IMPLIES(a, b) ((b) || (!(a)))

@@ -27,13 +27,13 @@
     { name: "NumSrc",
       desc: "Number of interrupt sources",
       type: "int",
-      default: "180",
+      default: "181",
       local: "true"
     },
     { name: "NumTarget",
       desc: "Number of Targets (Harts)",
       type: "int",
-      default: "1",
+      default: "2",
       local: "true",
     },
     { name: "PrioWidth",
@@ -1511,7 +1511,15 @@
         { bits: "1:0" }
       ],
     }
-    { skipto: "768" }
+    { name: "PRIO180",
+      desc: "Interrupt Source 180 Priority",
+      swaccess: "rw",
+      hwaccess: "hro",
+      fields: [
+        { bits: "1:0" }
+      ],
+    }
+    { skipto: "1024" }
     { multireg: {
         name: "IE0",
         desc: "Interrupt Enable for Target 0",
@@ -1549,6 +1557,52 @@
     { name: "MSIP0",
       desc: '''msip for Hart 0.
       Write 1 to here asserts software interrupt for Hart msip_o[0], write 0 to clear.''',
+      swaccess: "rw",
+      hwaccess: "hro",
+      fields: [
+        { bits: "0",
+          desc: "Software Interrupt Pending register",
+        }
+      ],
+    }
+    { skipto: "1280" }
+    { multireg: {
+        name: "IE1",
+        desc: "Interrupt Enable for Target 1",
+        count: "NumSrc",
+        cname: "RV_PLIC",
+        swaccess: "rw",
+        hwaccess: "hro",
+        fields: [
+          { bits: "0", name: "E", desc: "Interrupt Enable of Source" }
+        ],
+      }
+    }
+    { name: "THRESHOLD1",
+      desc: "Threshold of priority for Target 1",
+      swaccess: "rw",
+      hwaccess: "hro",
+      fields: [
+        { bits: "1:0" }
+      ],
+    }
+    { name: "CC1",
+      desc: '''Claim interrupt by read, complete interrupt by write for Target 1.
+      Value read/written is interrupt ID. Reading a value of 0 means no pending interrupts.''',
+      swaccess: "rw",
+      hwaccess: "hrw",
+      hwext: "true",
+      hwqe: "true",
+      hwre: "true",
+      fields: [
+        { bits: "7:0" }
+      ],
+      tags: [// CC register value is related to IP
+             "excl:CsrNonInitTests:CsrExclCheck"],
+    }
+    { name: "MSIP1",
+      desc: '''msip for Hart 1.
+      Write 1 to here asserts software interrupt for Hart msip_o[1], write 0 to clear.''',
       swaccess: "rw",
       hwaccess: "hro",
       fields: [

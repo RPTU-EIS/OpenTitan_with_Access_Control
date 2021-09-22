@@ -12,7 +12,9 @@ filesets:
       - lowrisc:tlul:common
       - lowrisc:tlul:trans_intg
       - lowrisc:constants:top_pkg
+      - lowrisc:top_earlgrey:xbar_main
     files:
+      - rtl/tlul_adapter_slave_pkg.sv
       - rtl/tlul_adapter_slave.sv
     file_type: systemVerilogSource
 

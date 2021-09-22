@@ -31,7 +31,7 @@ set DUT "prim_prince"
 # set DUT "prim_present"
 
 lappend search_path "../../../ip/prim/rtl/"
-set SRC {  "../../../ip/prim/rtl/prim_assert.sv" \
+set SRC {  "prim_assert.sv" \
            "../../../ip/prim/rtl/prim_cipher_pkg.sv" \
            "../../../ip/prim/rtl/prim_present.sv" \
            "../../../ip/prim/rtl/prim_prince.sv" \

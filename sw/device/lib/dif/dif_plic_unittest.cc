@@ -20,9 +20,9 @@ using testing::Test;
 
 // If either of these static assertions fail, then the unit-tests for related
 // API should be revisited.
-static_assert(RV_PLIC_PARAM_NUM_SRC == 180,
+static_assert(RV_PLIC_PARAM_NUM_SRC == 181,
               "PLIC instantiation parameters have changed.");
-static_assert(RV_PLIC_PARAM_NUM_TARGET == 1,
+static_assert(RV_PLIC_PARAM_NUM_TARGET == 2,
               "PLIC instantiation parameters have changed.");
 
 constexpr uint32_t kTarget0 = 0;
@@ -310,7 +310,7 @@ TEST_F(IrqPendingStatusGetTest, Disabled) {
 }
 
 class IrqClaimTest : public PlicTest {
-  static_assert(RV_PLIC_PARAM_NUM_TARGET == 1, "");
+  static_assert(RV_PLIC_PARAM_NUM_TARGET == 2, "");
 };
 
 TEST_F(IrqClaimTest, NullArgs) {
@@ -337,7 +337,7 @@ TEST_F(IrqClaimTest, Target0Success) {
 }
 
 class IrqCompleteTest : public PlicTest {
-  static_assert(RV_PLIC_PARAM_NUM_TARGET == 1, "");
+  static_assert(RV_PLIC_PARAM_NUM_TARGET == 2, "");
 };
 
 TEST_F(IrqCompleteTest, NullArgs) {
@@ -363,7 +363,7 @@ TEST_F(IrqCompleteTest, Target0Success) {
 }
 
 class SoftwareIrqForceTest : public PlicTest {
-  static_assert(RV_PLIC_PARAM_NUM_TARGET == 1, "");
+  static_assert(RV_PLIC_PARAM_NUM_TARGET == 2, "");
 };
 
 TEST_F(SoftwareIrqForceTest, NullArgs) {
@@ -381,7 +381,7 @@ TEST_F(SoftwareIrqForceTest, Target0Success) {
 }
 
 class SoftwareIrqAcknowledgeTest : public PlicTest {
-  static_assert(RV_PLIC_PARAM_NUM_TARGET == 1, "");
+  static_assert(RV_PLIC_PARAM_NUM_TARGET == 2, "");
 };
 
 TEST_F(SoftwareIrqAcknowledgeTest, NullArgs) {
@@ -400,7 +400,7 @@ TEST_F(SoftwareIrqAcknowledgeTest, Target0Success) {
 }
 
 class SoftwareIrqIsPendingTest : public PlicTest {
-  static_assert(RV_PLIC_PARAM_NUM_TARGET == 1, "");
+  static_assert(RV_PLIC_PARAM_NUM_TARGET == 2, "");
 };
 
 TEST_F(SoftwareIrqIsPendingTest, NullArgs) {

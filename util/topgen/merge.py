@@ -177,7 +177,9 @@ predefined_modules = {
     "corei": "rv_core_ibex",
     "cored": "rv_core_ibex",
     "dm_sba": "rv_dm",
-    "debug_mem": "rv_dm"
+    "debug_mem": "rv_dm",
+    "untrusted_m": "untrusted_device",
+    "untrusted_s": "untrusted_device"
 }
 
 
@@ -344,8 +346,38 @@ def xbar_adddevice(top: Dict[str, object],
                     node["xbar"] = False
                     node["stub"] = False
                     process_pipeline_var(node)
-            else:
-                log.error("device %s shouldn't be host type" % device)
+
+            else: 
+                if device == "untrusted_s":
+                    if node is None:
+                        # Add new untrusted_s
+                        xbar["nodes"].append({
+                            "name": "untrusted_s",
+                            "type": "device",
+                            "clock": xbar['clock'],
+                            "reset": xbar['reset'],
+                            "inst_type": predefined_modules["untrusted_s"],
+                            "addr_range": [OrderedDict([
+                                ("base_addr", top["untrusted_s_base_addr"]),
+                                ("size_byte", "0x1000"),
+                            ])],
+                            "xbar": False,
+                            "stub": False,
+                            "pipeline": "false",
+                            "pipeline_byp": "false"
+                        })  # yapf: disable
+                    else:
+                        # Update if exists
+                        node["inst_type"] = predefined_modules["untrusted_s"]
+                        node["addr_range"] = [
+                            OrderedDict([("base_addr", top["untrusted_s_base_addr"]),
+                                        ("size_byte", "0x1000")])
+                        ]
+                        node["xbar"] = False
+                        node["stub"] = False
+                        process_pipeline_var(node)
+                else:
+                    log.error("device %s shouldn't be host type" % device)
 
             return
 
@@ -1075,7 +1107,8 @@ def merge_top(topcfg: OrderedDict,
     # Declare structure for exported resets.
     amend_resets(topcfg)
 
-    # remove unwanted fields 'debug_mem_base_addr'
+    # remove unwanted fields 'debug_mem_base_addr', 'untrusted_s_base_addr'
     topcfg.pop('debug_mem_base_addr', None)
+    topcfg.pop('untrusted_s_base_addr', None)
 
     return topcfg

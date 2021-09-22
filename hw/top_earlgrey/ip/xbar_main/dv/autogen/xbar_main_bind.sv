@@ -24,6 +24,12 @@ module xbar_main_bind;
     .h2d    (tl_dm_sba_i),
     .d2h    (tl_dm_sba_o)
   );
+  bind xbar_main tlul_assert #(.EndpointType("Device")) tlul_assert_host_untrusted_m (
+    .clk_i  (clk_main_i),
+    .rst_ni (rst_main_ni),
+    .h2d    (tl_untrusted_m_i),
+    .d2h    (tl_untrusted_m_o)
+  );
 
   // Device interfaces
   bind xbar_main tlul_assert #(.EndpointType("Host")) tlul_assert_device_rom_ctrl__rom (
@@ -139,6 +145,18 @@ module xbar_main_bind;
     .rst_ni (rst_main_ni),
     .h2d    (tl_sram_ctrl_main_o),
     .d2h    (tl_sram_ctrl_main_i)
+  );
+  bind xbar_main tlul_assert #(.EndpointType("Host")) tlul_assert_device_bus_ctrl (
+    .clk_i  (clk_main_i),
+    .rst_ni (rst_main_ni),
+    .h2d    (tl_bus_ctrl_o),
+    .d2h    (tl_bus_ctrl_i)
+  );
+  bind xbar_main tlul_assert #(.EndpointType("Host")) tlul_assert_device_untrusted_s (
+    .clk_i  (clk_main_i),
+    .rst_ni (rst_main_ni),
+    .h2d    (tl_untrusted_s_o),
+    .d2h    (tl_untrusted_s_i)
   );
 
 endmodule

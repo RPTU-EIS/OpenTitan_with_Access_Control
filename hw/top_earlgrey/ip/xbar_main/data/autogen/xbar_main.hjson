@@ -30,6 +30,12 @@
       act:    "rsp"
       package: "tlul_pkg"
     }
+    { struct: "tl"
+      type:   "req_rsp"
+      name:   "tl_untrusted_m"
+      act:    "rsp"
+      package: "tlul_pkg"
+    }
     // device
     { struct: "tl"
       type:   "req_rsp"
@@ -142,6 +148,18 @@
     { struct: "tl"
       type:   "req_rsp"
       name:   "tl_sram_ctrl_main"
+      act:    "req"
+      package: "tlul_pkg"
+    }
+    { struct: "tl"
+      type:   "req_rsp"
+      name:   "tl_bus_ctrl"
+      act:    "req"
+      package: "tlul_pkg"
+    }
+    { struct: "tl"
+      type:   "req_rsp"
+      name:   "tl_untrusted_s"
       act:    "req"
       package: "tlul_pkg"
     }

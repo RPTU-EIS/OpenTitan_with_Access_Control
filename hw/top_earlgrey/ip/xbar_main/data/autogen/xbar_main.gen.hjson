@@ -56,11 +56,34 @@
       keymgr
       kmac
       sram_ctrl_main
+      bus_ctrl
+      untrusted_s
     ]
     dm_sba:
     [
       rom_ctrl.rom
       rom_ctrl.regs
+      ram_main
+      eflash
+      peri
+      flash_ctrl.core
+      flash_ctrl.prim
+      aes
+      entropy_src
+      csrng
+      edn0
+      edn1
+      hmac
+      rv_plic
+      otbn
+      keymgr
+      kmac
+      sram_ctrl_main
+      bus_ctrl
+      untrusted_s
+    ]
+    untrusted_m:
+    [
       ram_main
       eflash
       peri
@@ -113,6 +136,17 @@
       stub: false
       inst_type: rv_dm
       pipeline: "true"
+    }
+    {
+      name: untrusted_m
+      type: host
+      clock: clk_main_i
+      reset: rst_main_ni
+      pipeline: "false"
+      xbar: false
+      stub: false
+      inst_type: untrusted_device
+      pipeline_byp: "true"
     }
     {
       name: rom_ctrl.rom
@@ -217,7 +251,11 @@
       [
         {
           base_addr: 0x40000000
-          size_byte: 0x800000
+          size_byte: 0x200000
+        }
+        {
+          base_addr: 0x40400000
+          size_byte: 0x400000
         }
       ]
     }
@@ -448,6 +486,42 @@
       [
         {
           base_addr: 0x411c0000
+          size_byte: 0x1000
+        }
+      ]
+      xbar: false
+      stub: false
+      pipeline_byp: "true"
+    }
+    {
+      name: bus_ctrl
+      type: device
+      clock: clk_main_i
+      reset: rst_main_ni
+      pipeline: "false"
+      inst_type: bus_ctrl
+      addr_range:
+      [
+        {
+          base_addr: 0x30000000
+          size_byte: 0x1000
+        }
+      ]
+      xbar: false
+      stub: false
+      pipeline_byp: "true"
+    }
+    {
+      name: untrusted_s
+      type: device
+      clock: clk_main_i
+      reset: rst_main_ni
+      pipeline: "false"
+      inst_type: untrusted_device
+      addr_range:
+      [
+        {
+          base_addr: 0x40300000
           size_byte: 0x1000
         }
       ]

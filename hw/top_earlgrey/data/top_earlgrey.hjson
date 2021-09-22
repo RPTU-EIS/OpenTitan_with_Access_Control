@@ -165,7 +165,7 @@
   }
 
   // Number of cores: used in rv_plic and timer
-  num_cores: "1",
+  num_cores: "2",
 
 
   // `host` defines the host only components in the system (such as processor)
@@ -221,6 +221,52 @@
           package: "jtag_pkg",
         },
       ]
+    }
+    { name: "untrusted_device",
+      type: "untrusted_device",
+      inter_signal_list: [
+        { struct:  "esc_tx",
+          type:    "uni",
+          name:    "esc_nmi_tx",
+          act:     "rcv",
+          package: "prim_esc_pkg",
+        },
+
+        { struct:  "esc_rx",
+          type:    "uni",
+          name:    "esc_nmi_rx",
+          act:     "req",
+          package: "prim_esc_pkg",
+        },
+
+        { struct:  "crash_dump",
+          type:    "uni",
+          name:    "crash_dump",
+          act:     "req",
+          package: "ibex_pkg",
+        },
+
+        { struct:  "lc_tx_t",
+          type:    "uni",
+          name:    "lc_cpu_en",
+          act:     "rcv",
+          package: "lc_ctrl_pkg",
+        },
+
+        { struct:  "ram_1p_cfg_t",
+          type:    "uni",
+          name:    "ram_cfg",
+          act:     "rcv",
+          package: "prim_ram_1p_pkg"
+        },
+
+        { struct:  "rom_cfg_t",
+          type:    "uni",
+          name:    "rom_cfg",
+          act:     "rcv",
+          package: "prim_rom_pkg"
+        }
+      ],
     }
   ]
 
@@ -597,6 +643,13 @@
       reset_connections: {rst_ni: "sys"},
       base_addrs: {rom: "0x00008000", regs: "0x411e0000"}
     }
+    { name: "bus_ctrl",
+      type: "bus_ctrl",
+      clock_srcs: {clk_i: "main"},
+      clock_group: "secure",
+      reset_connections: {rst_ni: "sys"},
+      base_addr: "0x40800000"
+    }
   ]
 
   // Memories (ROM, RAM, eFlash) are defined at the top.
@@ -840,13 +893,13 @@
   //  e.g flash_ctrl0.flash: [flash_phy0.flash_ctrl]
   inter_module: {
     'connect': {
-      'ast.ram_1p_cfg'          : ['otbn.ram_cfg', 'ram_main.cfg', 'ram_ret_aon.cfg', 'rv_core_ibex.ram_cfg'],
+      'ast.ram_1p_cfg'          : ['otbn.ram_cfg', 'ram_main.cfg', 'ram_ret_aon.cfg', 'rv_core_ibex.ram_cfg', 'untrusted_device.ram_cfg'],
       'ast.ram_2p_cfg'          : ['spi_device.ram_cfg', 'usbdev.ram_cfg'],
-      'ast.rom_cfg'             : ['rom_ctrl.rom_cfg'],
+      'ast.rom_cfg'             : ['rom_ctrl.rom_cfg', 'untrusted_device.rom_cfg'],
       'alert_handler.crashdump' : ['rstmgr_aon.alert_dump'],
       'alert_handler.esc_rx'    : ['rv_core_ibex.esc_nmi_rx',
                                    'lc_ctrl.esc_wipe_secrets_rx',
-                                   'lc_ctrl.esc_scrap_state_rx'
+                                   'lc_ctrl.esc_scrap_state_rx',
                                    'pwrmgr_aon.esc_rst_rx'],
       'alert_handler.esc_tx'    : ['rv_core_ibex.esc_nmi_tx',
                                    'lc_ctrl.esc_wipe_secrets_tx',
@@ -933,7 +986,8 @@
                                       'sram_ctrl_ret_aon.lc_hw_debug_en',
                                       'pinmux_aon.lc_hw_debug_en',
                                       'csrng.lc_hw_debug_en'],
-      'lc_ctrl.lc_cpu_en'          : ['rv_core_ibex.lc_cpu_en'],
+      'lc_ctrl.lc_cpu_en'          : ['rv_core_ibex.lc_cpu_en'
+                                      'untrusted_device.lc_cpu_en'],
       'lc_ctrl.lc_keymgr_en'       : ['keymgr.lc_keymgr_en'],
       'lc_ctrl.lc_escalate_en'     : ['aes.lc_escalate_en',
                                       'otp_ctrl.lc_escalate_en',
@@ -966,6 +1020,7 @@
 
         // Xbars
         'main.tl_corei', 'main.tl_cored', 'main.tl_dm_sba', 'main.tl_debug_mem',
+        'main.tl_untrusted_m', 'main.tl_untrusted_s'
 
         // Pinmux JTAG signals for the tool-inserted DFT TAP
         'pinmux_aon.dft_jtag',
@@ -1021,6 +1076,8 @@
   },
 
   debug_mem_base_addr: "0x1A110000",
+  untrusted_s_base_addr: "0x40300000"
+  
 
   // Crossbars: having a top level crossbar
   // This version assumes all crossbars are instantiated at the top.

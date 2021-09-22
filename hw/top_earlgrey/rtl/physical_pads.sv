@@ -5,7 +5,7 @@
 // This is a physical pads placeholder for the open-source views.
 // Special physical pad outputs and power sequencing signals are just tied off.
 
-`include "prim_assert.sv"
+`include "../../ip/prim/rtl/prim_assert.sv"
 
 module physical_pads
   import prim_pad_wrapper_pkg::*;

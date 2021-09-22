@@ -54,8 +54,8 @@ module flash_ctrl_prim_reg_top (
     .tl_o
   );
 
-  tlul_pkg::tl_h2d_t tl_socket_h2d [0];
-  tlul_pkg::tl_d2h_t tl_socket_d2h [0];
+  tlul_pkg::tl_h2d_t tl_socket_h2d /*[0]*/;
+  tlul_pkg::tl_d2h_t tl_socket_d2h /*[0]*/;
 
   logic [0:0] reg_steer;
 

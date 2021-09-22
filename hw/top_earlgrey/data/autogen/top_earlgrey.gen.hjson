@@ -413,7 +413,7 @@
       }
     ]
   }
-  num_cores: "1"
+  num_cores: "2"
   host:
   [
     {
@@ -500,6 +500,76 @@
           width: 1
           default: ""
           top_signame: pinmux_aon_rv_jtag
+          index: -1
+        }
+      ]
+    }
+    {
+      name: untrusted_device
+      type: untrusted_device
+      inter_signal_list:
+      [
+        {
+          struct: esc_tx
+          type: uni
+          name: esc_nmi_tx
+          act: rcv
+          package: prim_esc_pkg
+          inst_name: untrusted_device
+          index: -1
+        }
+        {
+          struct: esc_rx
+          type: uni
+          name: esc_nmi_rx
+          act: req
+          package: prim_esc_pkg
+          inst_name: untrusted_device
+          index: -1
+        }
+        {
+          struct: crash_dump
+          type: uni
+          name: crash_dump
+          act: req
+          package: ibex_pkg
+          inst_name: untrusted_device
+          index: -1
+        }
+        {
+          struct: lc_tx_t
+          type: uni
+          name: lc_cpu_en
+          act: rcv
+          package: lc_ctrl_pkg
+          inst_name: untrusted_device
+          width: 1
+          default: ""
+          top_signame: lc_ctrl_lc_cpu_en
+          index: -1
+        }
+        {
+          struct: ram_1p_cfg_t
+          type: uni
+          name: ram_cfg
+          act: rcv
+          package: prim_ram_1p_pkg
+          inst_name: untrusted_device
+          width: 1
+          default: ""
+          top_signame: ast_ram_1p_cfg
+          index: -1
+        }
+        {
+          struct: rom_cfg_t
+          type: uni
+          name: rom_cfg
+          act: rcv
+          package: prim_rom_pkg
+          inst_name: untrusted_device
+          width: 1
+          default: ""
+          top_signame: ast_rom_cfg
           index: -1
         }
       ]
@@ -5343,6 +5413,65 @@
         }
       ]
     }
+    {
+      name: bus_ctrl
+      type: bus_ctrl
+      clock_srcs:
+      {
+        clk_i: main
+      }
+      clock_group: secure
+      reset_connections:
+      {
+        rst_ni: rstmgr_aon_resets.rst_sys_n[rstmgr_pkg::Domain0Sel]
+      }
+      clock_connections:
+      {
+        clk_i: clkmgr_aon_clocks.clk_main_secure
+      }
+      domain: "0"
+      param_list: []
+      inter_signal_list:
+      [
+        {
+          name: master_bits
+          struct: master_bits
+          package: bus_ctrl_pkg
+          type: uni
+          act: req
+          width: 1
+          inst_name: bus_ctrl
+          index: -1
+        }
+        {
+          name: slave_bits
+          struct: slave_bits
+          package: bus_ctrl_pkg
+          type: uni
+          act: req
+          width: 1
+          inst_name: bus_ctrl
+          index: -1
+        }
+        {
+          name: tl
+          struct: tl
+          package: tlul_pkg
+          type: req_rsp
+          act: rsp
+          width: 1
+          inst_name: bus_ctrl
+          default: ""
+          end_idx: -1
+          top_signame: bus_ctrl_tl
+          index: -1
+        }
+      ]
+      base_addrs:
+      {
+        null: 0x30000000
+      }
+    }
   ]
   memory:
   [
@@ -5785,6 +5914,7 @@
         ram_main.cfg
         ram_ret_aon.cfg
         rv_core_ibex.ram_cfg
+        untrusted_device.ram_cfg
       ]
       ast.ram_2p_cfg:
       [
@@ -5794,6 +5924,7 @@
       ast.rom_cfg:
       [
         rom_ctrl.rom_cfg
+        untrusted_device.rom_cfg
       ]
       alert_handler.crashdump:
       [
@@ -6024,6 +6155,7 @@
       lc_ctrl.lc_cpu_en:
       [
         rv_core_ibex.lc_cpu_en
+        untrusted_device.lc_cpu_en
       ]
       lc_ctrl.lc_keymgr_en:
       [
@@ -6160,6 +6292,10 @@
       [
         main.tl_sram_ctrl_main
       ]
+      bus_ctrl.tl:
+      [
+        main.tl_bus_ctrl
+      ]
       uart0.tl:
       [
         peri.tl_uart0
@@ -6284,6 +6420,8 @@
       main.tl_cored
       main.tl_dm_sba
       main.tl_debug_mem
+      main.tl_untrusted_m
+      main.tl_untrusted_s
       pinmux_aon.dft_jtag
       otp_ctrl.otp_hw_cfg
       csrng.otp_en_csrng_sw_app_read
@@ -6384,11 +6522,34 @@
           keymgr
           kmac
           sram_ctrl_main
+          bus_ctrl
+          untrusted_s
         ]
         dm_sba:
         [
           rom_ctrl.rom
           rom_ctrl.regs
+          ram_main
+          eflash
+          peri
+          flash_ctrl.core
+          flash_ctrl.prim
+          aes
+          entropy_src
+          csrng
+          edn0
+          edn1
+          hmac
+          rv_plic
+          otbn
+          keymgr
+          kmac
+          sram_ctrl_main
+          bus_ctrl
+          untrusted_s
+        ]
+        untrusted_m:
+        [
           ram_main
           eflash
           peri
@@ -6441,6 +6602,17 @@
           stub: false
           inst_type: rv_dm
           pipeline: "true"
+        }
+        {
+          name: untrusted_m
+          type: host
+          clock: clk_main_i
+          reset: rst_main_ni
+          pipeline: "false"
+          xbar: false
+          stub: false
+          inst_type: untrusted_device
+          pipeline_byp: "true"
         }
         {
           name: rom_ctrl.rom
@@ -6545,7 +6717,11 @@
           [
             {
               base_addr: 0x40000000
-              size_byte: 0x800000
+              size_byte: 0x200000
+            }
+            {
+              base_addr: 0x40400000
+              size_byte: 0x400000
             }
           ]
         }
@@ -6783,6 +6959,42 @@
           stub: false
           pipeline_byp: "true"
         }
+        {
+          name: bus_ctrl
+          type: device
+          clock: clk_main_i
+          reset: rst_main_ni
+          pipeline: "false"
+          inst_type: bus_ctrl
+          addr_range:
+          [
+            {
+              base_addr: 0x30000000
+              size_byte: 0x1000
+            }
+          ]
+          xbar: false
+          stub: false
+          pipeline_byp: "true"
+        }
+        {
+          name: untrusted_s
+          type: device
+          clock: clk_main_i
+          reset: rst_main_ni
+          pipeline: "false"
+          inst_type: untrusted_device
+          addr_range:
+          [
+            {
+              base_addr: 0x40300000
+              size_byte: 0x1000
+            }
+          ]
+          xbar: false
+          stub: false
+          pipeline_byp: "true"
+        }
       ]
       clock: clk_main_i
       type: xbar
@@ -6822,6 +7034,18 @@
           inst_name: main
           default: ""
           top_signame: main_tl_dm_sba
+          index: -1
+        }
+        {
+          name: tl_untrusted_m
+          struct: tl
+          package: tlul_pkg
+          type: req_rsp
+          act: rsp
+          width: 1
+          inst_name: main
+          default: ""
+          top_signame: main_tl_untrusted_m
           index: -1
         }
         {
@@ -7051,6 +7275,30 @@
           inst_name: main
           default: ""
           top_signame: sram_ctrl_main_tl
+          index: -1
+        }
+        {
+          name: tl_bus_ctrl
+          struct: tl
+          package: tlul_pkg
+          type: req_rsp
+          act: req
+          width: 1
+          inst_name: main
+          default: ""
+          top_signame: bus_ctrl_tl
+          index: -1
+        }
+        {
+          name: tl_untrusted_s
+          struct: tl
+          package: tlul_pkg
+          type: req_rsp
+          act: req
+          width: 1
+          inst_name: main
+          default: ""
+          top_signame: main_tl_untrusted_s
           index: -1
         }
       ]
@@ -11216,6 +11464,12 @@
       module_name: rv_timer
     }
     {
+      name: rv_timer_timer_expired_1_0
+      width: 1
+      type: interrupt
+      module_name: rv_timer
+    }
+    {
       name: usbdev_pkt_received
       width: 1
       type: interrupt
@@ -15044,6 +15298,39 @@
         index: -1
       }
       {
+        name: master_bits
+        struct: master_bits
+        package: bus_ctrl_pkg
+        type: uni
+        act: req
+        width: 1
+        inst_name: bus_ctrl
+        index: -1
+      }
+      {
+        name: slave_bits
+        struct: slave_bits
+        package: bus_ctrl_pkg
+        type: uni
+        act: req
+        width: 1
+        inst_name: bus_ctrl
+        index: -1
+      }
+      {
+        name: tl
+        struct: tl
+        package: tlul_pkg
+        type: req_rsp
+        act: rsp
+        width: 1
+        inst_name: bus_ctrl
+        default: ""
+        end_idx: -1
+        top_signame: bus_ctrl_tl
+        index: -1
+      }
+      {
         struct: tl
         package: tlul_pkg
         type: req_rsp
@@ -15338,6 +15625,18 @@
         index: -1
       }
       {
+        name: tl_untrusted_m
+        struct: tl
+        package: tlul_pkg
+        type: req_rsp
+        act: rsp
+        width: 1
+        inst_name: main
+        default: ""
+        top_signame: main_tl_untrusted_m
+        index: -1
+      }
+      {
         name: tl_rom_ctrl__rom
         struct: tl
         package: tlul_pkg
@@ -15564,6 +15863,30 @@
         inst_name: main
         default: ""
         top_signame: sram_ctrl_main_tl
+        index: -1
+      }
+      {
+        name: tl_bus_ctrl
+        struct: tl
+        package: tlul_pkg
+        type: req_rsp
+        act: req
+        width: 1
+        inst_name: main
+        default: ""
+        top_signame: bus_ctrl_tl
+        index: -1
+      }
+      {
+        name: tl_untrusted_s
+        struct: tl
+        package: tlul_pkg
+        type: req_rsp
+        act: req
+        width: 1
+        inst_name: main
+        default: ""
+        top_signame: main_tl_untrusted_s
         index: -1
       }
       {
@@ -15999,6 +16322,69 @@
         width: 1
         default: ""
         top_signame: pinmux_aon_rv_jtag
+        index: -1
+      }
+      {
+        struct: esc_tx
+        type: uni
+        name: esc_nmi_tx
+        act: rcv
+        package: prim_esc_pkg
+        inst_name: untrusted_device
+        index: -1
+      }
+      {
+        struct: esc_rx
+        type: uni
+        name: esc_nmi_rx
+        act: req
+        package: prim_esc_pkg
+        inst_name: untrusted_device
+        index: -1
+      }
+      {
+        struct: crash_dump
+        type: uni
+        name: crash_dump
+        act: req
+        package: ibex_pkg
+        inst_name: untrusted_device
+        index: -1
+      }
+      {
+        struct: lc_tx_t
+        type: uni
+        name: lc_cpu_en
+        act: rcv
+        package: lc_ctrl_pkg
+        inst_name: untrusted_device
+        width: 1
+        default: ""
+        top_signame: lc_ctrl_lc_cpu_en
+        index: -1
+      }
+      {
+        struct: ram_1p_cfg_t
+        type: uni
+        name: ram_cfg
+        act: rcv
+        package: prim_ram_1p_pkg
+        inst_name: untrusted_device
+        width: 1
+        default: ""
+        top_signame: ast_ram_1p_cfg
+        index: -1
+      }
+      {
+        struct: rom_cfg_t
+        type: uni
+        name: rom_cfg
+        act: rcv
+        package: prim_rom_pkg
+        inst_name: untrusted_device
+        width: 1
+        default: ""
+        top_signame: ast_rom_cfg
         index: -1
       }
       {
@@ -17925,6 +18311,28 @@
       {
         package: tlul_pkg
         struct: tl_h2d
+        signame: bus_ctrl_tl_req
+        width: 1
+        type: req_rsp
+        end_idx: -1
+        act: rsp
+        suffix: req
+        default: tlul_pkg::TL_H2D_DEFAULT
+      }
+      {
+        package: tlul_pkg
+        struct: tl_d2h
+        signame: bus_ctrl_tl_rsp
+        width: 1
+        type: req_rsp
+        end_idx: -1
+        act: rsp
+        suffix: rsp
+        default: ""
+      }
+      {
+        package: tlul_pkg
+        struct: tl_h2d
         signame: uart0_tl_req
         width: 1
         type: req_rsp
@@ -18650,6 +19058,42 @@
         package: tlul_pkg
         struct: tl_d2h
         signame: main_tl_debug_mem_rsp
+        width: 1
+        type: req_rsp
+        end_idx: -1
+        default: ""
+      }
+      {
+        package: tlul_pkg
+        struct: tl_h2d
+        signame: main_tl_untrusted_m_req
+        width: 1
+        type: req_rsp
+        end_idx: -1
+        default: ""
+      }
+      {
+        package: tlul_pkg
+        struct: tl_d2h
+        signame: main_tl_untrusted_m_rsp
+        width: 1
+        type: req_rsp
+        end_idx: -1
+        default: ""
+      }
+      {
+        package: tlul_pkg
+        struct: tl_h2d
+        signame: main_tl_untrusted_s_req
+        width: 1
+        type: req_rsp
+        end_idx: -1
+        default: ""
+      }
+      {
+        package: tlul_pkg
+        struct: tl_d2h
+        signame: main_tl_untrusted_s_rsp
         width: 1
         type: req_rsp
         end_idx: -1

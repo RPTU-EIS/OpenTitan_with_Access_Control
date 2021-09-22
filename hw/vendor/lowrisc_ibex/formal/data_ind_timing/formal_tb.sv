@@ -4,7 +4,7 @@
 
 // A formal testbench for the ICache. This gets bound into the actual ICache DUT.
 
-`include "prim_assert.sv"
+`include "../../prim/rtl/prim_assert.sv"
 
 module formal_tb (
    // Top-level ports

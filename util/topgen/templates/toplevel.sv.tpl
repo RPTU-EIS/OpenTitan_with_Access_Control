@@ -173,10 +173,10 @@ module top_${top["name"]} #(
 
 
 <% add_spaces = " " * len(str((interrupt_num-1).bit_length()-1)) %>
-  logic [0:0]${add_spaces}irq_plic;
-  logic [0:0]${add_spaces}msip;
-  logic [${(interrupt_num-1).bit_length()-1}:0] irq_id[1];
-  logic [${(interrupt_num-1).bit_length()-1}:0] unused_irq_id[1];
+  logic [1:0]${add_spaces}irq_plic;
+  logic [1:0]${add_spaces}msip;
+  logic [${(interrupt_num-1).bit_length()-1}:0] irq_id[2];
+  logic [${(interrupt_num-1).bit_length()-1}:0] unused_irq_id[2];
 
   // this avoids lint errors
   assign unused_irq_id = irq_id;
@@ -316,9 +316,9 @@ module top_${top["name"]} #(
     .tl_d_o               (main_tl_cored_req),
     .tl_d_i               (main_tl_cored_rsp),
     // interrupts
-    .irq_software_i       (msip),
+    .irq_software_i       (msip[0]),
     .irq_timer_i          (intr_rv_timer_timer_expired_0_0),
-    .irq_external_i       (irq_plic),
+    .irq_external_i       (irq_plic[0]),
     // escalation input from alert handler (NMI)
     .esc_tx_i             (alert_handler_esc_tx[0]),
     .esc_rx_o             (alert_handler_esc_rx[0]),
@@ -364,6 +364,62 @@ module top_${top["name"]} #(
     //JTAG
     .jtag_req_i    (pinmux_aon_rv_jtag_req),
     .jtag_rsp_o    (pinmux_aon_rv_jtag_rsp)
+  );
+
+  untrusted_device #(
+    .PMPEnable                (1),
+    .PMPGranularity           (0), // 2^(PMPGranularity+2) == 4 byte granularity
+    .PMPNumRegions            (16),
+    .MHPMCounterNum           (10),
+    .MHPMCounterWidth         (32),
+    .RV32E                    (0),
+    .RV32M                    (ibex_pkg::RV32MSingleCycle),
+    .RV32B                    (ibex_pkg::RV32BNone),
+    .RegFile                  (IbexRegFile),
+    .BranchTargetALU          (1),
+    .WritebackStage           (1),
+    .ICache                   (IbexICache),
+    .ICacheECC                (1),
+    .BranchPredictor          (0),
+    .DbgTriggerEn             (1),
+    .SecureIbex               (SecureIbex),
+    .DmHaltAddr               (ADDR_SPACE_DEBUG_MEM + dm::HaltAddress[31:0]),
+    .DmExceptionAddr          (ADDR_SPACE_DEBUG_MEM + dm::ExceptionAddress[31:0]),
+    .PipeLine                 (IbexPipeLine)
+  ) u_untrusted_device (
+    // clock and reset
+    .clk_i                (${cpu_clk}),
+    .rst_ni               (${cpu_rst}[rstmgr_pkg::Domain0Sel]),
+    .clk_esc_i            (${esc_clk}),
+    .rst_esc_ni           (${esc_rst}[rstmgr_pkg::Domain0Sel]),
+    .ram_cfg_i            (ast_ram_1p_cfg),
+    // static pinning
+    .hart_id_i            (32'h00000001),
+    .boot_addr_i          (ADDR_SPACE_ROM_CTRL__ROM),
+    // TL-UL buses
+    .tl_d_o               (main_tl_untrusted_m_req),
+    .tl_d_i               (main_tl_untrusted_m_rsp),
+    .tl_s_o               (main_tl_untrusted_s_rsp),
+    .tl_s_i               (main_tl_untrusted_s_req),
+    // interrupts
+    .irq_software_i       (msip[1]),
+    .irq_timer_i          (intr_rv_timer_timer_expired_1_0),
+    .irq_external_i       (irq_plic[1]),
+    // escalation input from alert handler (NMI)
+    .esc_tx_i             ('0),
+    .esc_rx_o             (),
+    // debug interface
+    .debug_req_i          ('0),
+    // crash dump interface
+    .crash_dump_o         (),
+    // CPU control signals
+    .lc_cpu_en_i          (lc_ctrl_lc_cpu_en),
+    .pwrmgr_cpu_en_i      (pwrmgr_aon_fetch_en),
+    .core_sleep_o         (),
+
+    // dft bypass
+    .scan_rst_ni,
+    .scanmode_i
   );
 
   assign rstmgr_aon_cpu.ndmreset_req = ndmreset_req;

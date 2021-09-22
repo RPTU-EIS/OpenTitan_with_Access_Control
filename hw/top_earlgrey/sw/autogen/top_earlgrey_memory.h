@@ -362,6 +362,35 @@
  * registers associated with the peripheral (usually via a DIF).
  */
 #define TOP_EARLGREY_ROM_CTRL_ROM_BASE_ADDR 0x8000
+/**
+ * Peripheral base address for bus_ctrl in top earlgrey.
+ *
+ * This should be used with #mmio_region_from_addr to access the memory-mapped
+ * registers associated with the peripheral (usually via a DIF).
+ */
+#define TOP_EARLGREY_BUS_CTRL_BASE_ADDR 0x40800000
+
+/**
+ * Memory base address for untrusted ROM in top earlgrey.
+ */
+#define TOP_EARLGREY_UNTRUSTED_ROM_BASE_ADDR 0x00000000
+
+/**
+ * Memory size for untrusted ROM in top earlgrey.
+ */
+#define TOP_EARLGREY_UNTRUSTED_ROM_SIZE_BYTES 0x4000
+
+/**
+ * Memory base address for untrusted RAM in top earlgrey.
+ */
+#define TOP_EARLGREY_UNTRUSTED_RAM_BASE_ADDR 0x50000000
+
+/**
+ * Memory size for untrusted RAM in top earlgrey.
+ */
+#define TOP_EARLGREY_UNTRUSTED_RAM_SIZE_BYTES 0x20000
+
+
 #endif  // __ASSEMBLER__
 
 #endif  // OPENTITAN_HW_TOP_EARLGREY_SW_AUTOGEN_TOP_EARLGREY_MEMORY_H_

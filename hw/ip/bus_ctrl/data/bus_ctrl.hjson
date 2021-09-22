@@ -1,0 +1,24 @@
+// Copyright lowRISC contributors.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+{ name: "bus_ctrl",
+  clock_primary: "clk_i",
+  bus_interfaces: [
+    { protocol: "tlul", direction: "device" }
+  ],
+  registers: [  ],
+  inter_signal_list: [
+    { struct:  "master_bits",
+      type:    "uni",
+      name:    "master_bits",
+      act:     "req",
+      package: "bus_ctrl_pkg"
+    },
+    { struct:  "slave_bits"
+      type:    "uni"
+      name:    "slave_bits"
+      act:     "req"
+      package: "bus_ctrl_pkg"
+    },
+  ]
+}

@@ -14,6 +14,9 @@ filesets:
       - lowrisc:tlul:adapter_host
       - lowrisc:tlul:adapter_slave
     files:
+      - rtl/untrusted_device_pkg.sv
+      - rtl/ibex_data_arb.sv
+      - rtl/rom_arb.sv
       - rtl/untrusted_device.sv
     file_type: systemVerilogSource
 

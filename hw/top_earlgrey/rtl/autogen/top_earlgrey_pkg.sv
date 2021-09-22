@@ -441,6 +441,16 @@ package top_earlgrey_pkg;
   parameter int unsigned TOP_EARLGREY_ROM_CTRL_ROM_SIZE_BYTES = 32'h4000;
 
   /**
+   * Peripheral base address for bus_ctrl in top earlgrey.
+   */
+  parameter int unsigned TOP_EARLGREY_BUS_CTRL_BASE_ADDR = 32'h40800000;
+
+  /**
+   * Peripheral size in bytes for bus_ctrl in top earlgrey.
+   */
+  parameter int unsigned TOP_EARLGREY_BUS_CTRL_SIZE_BYTES = 32'h1000;
+
+  /**
    * Memory base address for ram_main in top earlgrey.
    */
   parameter int unsigned TOP_EARLGREY_RAM_MAIN_BASE_ADDR = 32'h10000000;
@@ -469,6 +479,26 @@ package top_earlgrey_pkg;
    * Memory size for eflash in top earlgrey.
    */
   parameter int unsigned TOP_EARLGREY_EFLASH_SIZE_BYTES = 32'h100000;
+  
+    /**
+   * Memory base address for untrusted ROM in top earlgrey.
+   */
+  parameter int unsigned TOP_EARLGREY_UNTRUSTED_ROM_BASE_ADDR = 32'h0000;
+
+  /**
+   * Memory size for untrusted ROM in top earlgrey.
+   */
+  parameter int unsigned TOP_EARLGREY_UNTRUSTED_ROM_SIZE_BYTES = 32'h4000;
+
+    /**
+   * Memory base address for untrusted RAM in top earlgrey.
+   */
+  parameter int unsigned TOP_EARLGREY_UNTRUSTED_RAM_BASE_ADDR = 32'h50000000;
+
+  /**
+   * Memory size for untrusted RAM in top earlgrey.
+   */
+  parameter int unsigned TOP_EARLGREY_UNTRUSTED_RAM_SIZE_BYTES = 32'h20000;
 
 
   // Enumeration of IO power domains.

@@ -46,6 +46,8 @@ top_required = {
                     'is needed to run the software'],
     'debug_mem_base_addr': ['d', 'Base address of RV_DM. '
                                  'Planned to move to module'],
+    'untrusted_s_base_addr' : ['d', 'Base address of untrusted device'
+                                    'Added as a modification by Dino'],
     'xbar': ['l', 'List of the xbar used in the top'],
     'rnd_cnst_seed': ['int', "Seed for random netlist constant computation"],
     'pinout': ['g', 'Pinout configuration'],

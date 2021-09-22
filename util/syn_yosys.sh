@@ -90,6 +90,8 @@ declare -a modules=(
   "xbar_main"
   "xbar_peri"
   "flash_phy"
+  "bus_ctrl"
+  "untrusted_device"
 )
 
 # TODO: top_earlgrey appears to be too large for verification under the currrent

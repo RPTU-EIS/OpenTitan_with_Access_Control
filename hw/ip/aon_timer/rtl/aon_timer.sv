@@ -160,7 +160,11 @@ module aon_timer (
       .tl_h_i     (tl_i),
       .tl_h_o     (tl_o),
       .tl_d_o     (tl_aon_h2d),
-      .tl_d_i     (tl_aon_d2h)
+      .tl_d_i     (tl_aon_d2h),
+      .spare_req_i (1'b0),
+      .spare_req_o (),
+      .spare_rsp_i (1'b0),
+      .spare_rsp_o ()
   );
 
   // Lifecycle sync

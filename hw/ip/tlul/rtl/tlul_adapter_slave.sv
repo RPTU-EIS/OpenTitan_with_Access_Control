@@ -16,7 +16,7 @@
 // of that signal needs to contain all the necessary information for the core.
 //
 // When the core wants to respond, it sends a message to the host address in the following format:
-// addr_o = HOST_ADDRESS
+// addr_o = MASTER_ADDRESS
 // be_o = desired mask
 // wdata_o = desired data response
 //
@@ -26,7 +26,9 @@
 
 
 
-module tlul_adapter_slave (
+module tlul_adapter_slave
+  import tlul_adapter_slave_pkg::*;
+(
   input clk_i,
   input rst_ni,
 
@@ -47,11 +49,8 @@ module tlul_adapter_slave (
   input  tlul_pkg::tl_h2d_t          tl_i
 
 );
-  localparam int WordSize = $clog2(top_pkg::TL_DBW);
-  localparam logic [31:0] ADAPTER_ADDRESS = 32'h40200000;
-  localparam logic [31:0] HOST_ADDRESS    = 32'h40300000;
 
-  typedef enum logic [1:0] {
+  typedef enum logic [2:0] {
     IDLE          = 3'b000,
     WAIT_READY    = 3'b001,
     FORWARD_MSG   = 3'b010,
@@ -65,14 +64,15 @@ module tlul_adapter_slave (
   logic cpu_ready;
   logic response_sent;
 
-  logic source;
+  logic [7:0] source;
 
-  tlul_pkg::tl_d2h_t tl_i_fifo;
-  tlul_pkg::tl_h2d_t tl_o_fifo;
+  tlul_pkg::tl_h2d_t tl_i_fifo;
+  tlul_pkg::tl_d2h_t tl_o_fifo;
+  tlul_pkg::tl_d2h_t tl_out;
 
   assign msg_received = tl_i.a_valid && tl_o.a_ready;
-  assign cpu_ready = req_i && (addr_i == ADAPTER_ADDRESS) && !we_o;
-  assign response_sent = req_i && (addr_i == HOST_ADDRESS) && tl_i.d_ready;
+  assign cpu_ready = req_i && (addr_i == ADAPTER_ADDRESS) && !we_i;
+  assign response_sent = req_i && (addr_i == MASTER_ADDRESS) && tl_i.d_ready;
 
   always_ff @(posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
@@ -90,13 +90,20 @@ module tlul_adapter_slave (
       source <= tl_i_fifo.a_source;
   end
 
+  genvar i;
+  logic [31:0] mask;
+  for (i = 0; i < 4; i = i + 1) begin
+    always_comb begin
+      mask[i*8 +: 8] = be_i[i]? 8'hff : 8'h00;
+    end
+  end
+
   // FSM
   always_comb begin
     gnt_o       = '0;
     valid_o     = '0;
     rdata_o     = '0;
     err_o       = '0;
-    intg_err_o  = '0;
     irq_o       = '0;
     tl_o_fifo   = '0;
     next_state  = curr_state;
@@ -118,15 +125,16 @@ module tlul_adapter_slave (
       next_state = WAIT_RESPONSE;
     end
     WAIT_RESPONSE: begin
-      tl_o_fifo.d_valid = req_i && (addr_i == HOST_ADDRESS);
-      tl_o_fifo.d_opcode = (we_i) ? AccessAckData : AccessAck;
+      gnt_o = '1;
+      tl_o_fifo.d_valid = req_i && (addr_i == MASTER_ADDRESS);
+      tl_o_fifo.d_opcode = (we_i) ? tlul_pkg::AccessAckData : tlul_pkg::AccessAck;
       tl_o_fifo.d_size = 2'h2;
       tl_o_fifo.d_source = source;
-      tl_o_fifo.d_data = wdata_i & {8'(be_i[3]), 8'(be_i[2]), 8'(be_i[1]), 8'(be_i[0])};
+      tl_o_fifo.d_data = wdata_i & mask;
       next_state = (response_sent) ? ACK_RESPONSE : WAIT_RESPONSE;
     end
     ACK_RESPONSE: begin
-      rvalid_o = '1;
+      valid_o = '1;
       next_state = IDLE;
     end
     default:     next_state  = curr_state;
@@ -136,19 +144,25 @@ module tlul_adapter_slave (
   // FIFO holds the incoming requests until the core enters interrupt service routine
   tlul_fifo_sync #(
   .ReqPass(0),
-  .RspPass(0),
+  .RspPass(1),
   .ReqDepth(1),
   .RspDepth(1)
 ) fifo_i (
   .clk_i,
   .rst_ni,
   .tl_h_i      (tl_i),
-  .tl_h_o      (tl_o),
+  .tl_h_o      (tl_out),
   .tl_d_o      (tl_i_fifo),
   .tl_d_i      (tl_o_fifo),
   .spare_req_i (1'b0),
   .spare_req_o (),
   .spare_rsp_i (1'b0),
   .spare_rsp_o ());
+
+  // In order for the main core to accept the message, additional info needs to be appended
+  tlul_rsp_intg_gen u_rsp_gen (
+    .tl_i(tl_out),
+    .tl_o
+  );
 
   endmodule

@@ -274,18 +274,23 @@ module rv_plic import rv_plic_reg_pkg::*; #(
   assign prio[177] = reg2hw.prio177.q;
   assign prio[178] = reg2hw.prio178.q;
   assign prio[179] = reg2hw.prio179.q;
+  assign prio[180] = reg2hw.prio180.q;
 
   //////////////////////
   // Interrupt Enable //
   //////////////////////
-  for (genvar s = 0; s < 180; s++) begin : gen_ie0
+  for (genvar s = 0; s < 181; s++) begin : gen_ie0
     assign ie[0][s] = reg2hw.ie0[s].q;
+  end
+  for (genvar s = 0; s < 181; s++) begin : gen_ie1
+    assign ie[1][s] = reg2hw.ie1[s].q;
   end
 
   ////////////////////////
   // THRESHOLD register //
   ////////////////////////
   assign threshold[0] = reg2hw.threshold0.q;
+  assign threshold[1] = reg2hw.threshold1.q;
 
   /////////////////
   // CC register //
@@ -295,16 +300,22 @@ module rv_plic import rv_plic_reg_pkg::*; #(
   assign complete_we[0] = reg2hw.cc0.qe;
   assign complete_id[0] = reg2hw.cc0.q;
   assign hw2reg.cc0.d   = cc_id[0];
+  assign claim_re[1]    = reg2hw.cc1.re;
+  assign claim_id[1]    = irq_id_o[1];
+  assign complete_we[1] = reg2hw.cc1.qe;
+  assign complete_id[1] = reg2hw.cc1.q;
+  assign hw2reg.cc1.d   = cc_id[1];
 
   ///////////////////
   // MSIP register //
   ///////////////////
   assign msip_o[0] = reg2hw.msip0.q;
+  assign msip_o[1] = reg2hw.msip1.q;
 
   ////////
   // IP //
   ////////
-  for (genvar s = 0; s < 180; s++) begin : gen_ip
+  for (genvar s = 0; s < 181; s++) begin : gen_ip
     assign hw2reg.ip[s].de = 1'b1; // Always write
     assign hw2reg.ip[s].d  = ip[s];
   end
@@ -312,7 +323,7 @@ module rv_plic import rv_plic_reg_pkg::*; #(
   ///////////////////////////////////
   // Detection:: 0: Level, 1: Edge //
   ///////////////////////////////////
-  for (genvar s = 0; s < 180; s++) begin : gen_le
+  for (genvar s = 0; s < 181; s++) begin : gen_le
     assign le[s] = reg2hw.le[s].q;
   end
 

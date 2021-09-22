@@ -319,6 +319,17 @@
                     }
                   ]
              },
+             {    name: top_level_upec
+                  fusesoc_core: lowrisc:systems:top_level_upec
+                  import_cfgs: ["{proj_root}/hw/lint/tools/dvsim/common_lint_cfg.hjson"]
+                  rel_path: "hw/top_level_upec/lint/{tool}"
+                  overrides: [
+                    {
+                      name: design_level
+                      value: "top"
+                    }
+                  ]
+             },
              // these two currently cause compilation issues in AscentLint
              //{    name: chip_earlgrey_nexysvideo
              //     fusesoc_core: lowrisc:systems:chip_earlgrey_nexysvideo
