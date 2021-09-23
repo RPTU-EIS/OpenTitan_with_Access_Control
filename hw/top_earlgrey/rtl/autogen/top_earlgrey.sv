@@ -859,7 +859,7 @@ module top_earlgrey #(
     .ICacheECC                (1),
     .BranchPredictor          (0),
     .DbgTriggerEn             (1),
-    .SecureIbex               (SecureIbex),
+    .SecureIbex               (0),
     .DmHaltAddr               (ADDR_SPACE_DEBUG_MEM + dm::HaltAddress[31:0]),
     .DmExceptionAddr          (ADDR_SPACE_DEBUG_MEM + dm::ExceptionAddress[31:0]),
     .PipeLine                 (IbexPipeLine),

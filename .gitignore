@@ -9,7 +9,8 @@ opentitan-docs
 build/
 
 # build directories with special suffixes
-build*/
+build-bin/
+build-out/
 
 # Sphinx result
 _build/
