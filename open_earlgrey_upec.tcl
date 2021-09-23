@@ -1,7 +1,9 @@
 # Author: Dino Mehmedagić
 
 # Tcl script loads all OpenTitan Earl Grey HDL files with the top_level_upec as the top level file,
-# containing two instances of the Earl Grey chip, for verifivcation with UPEC
+# containing two instances of the Earl Grey chip, for verifivcation with UPEC. The script uses the
+# files in opentitan/build/lowrisc_systems_chip_earlgrey_verilator_0.1/src, which contains all the
+# necessary HDL to run the design in OneSpin
 
 # @lang=tcl @ts=8# @lang=tcl @ts=8# findFiles
 # basedir - the directory to start looking in
@@ -40,57 +42,9 @@ cd "~/opentitan"
 
 set_read_hdl_option -golden -verilog_version sv2012
 
-# read_verilog -golden  -pragma_ignore {} -version sv2012 ./hw/ip/prim/rtl/prim_util_pkg.sv
+set pkgbuildfiles [findFiles ./build-onespin/lowrisc_systems_chip_earlgrey_verilator_0.1/src  "*_pkg.sv"]
 
-# read_verilog -golden  -pragma_ignore {} -version sv2012 ./build/lowrisc_systems_chip_earlgrey_verilator_0.1/src/lowrisc_prim_abstract_buf_0/prim_buf.sv
-
-# read_verilog -golden  -pragma_ignore {} -version sv2012 ./build/lowrisc_systems_chip_earlgrey_verilator_0.1/src/lowrisc_prim_abstract_prim_pkg_0.1/prim_pkg.sv
-
-# set pkgIPfiles [findFiles ./hw/ip "*_pkg.sv"]
-
-# set hdlIPfiles [findFiles ./hw/ip  "*.sv"]
-
-# set pkgvendorfiles [findFiles ./hw/vendor  "*_pkg.sv"]
-
-# set hdlvendorfiles [findFiles ./hw/vendor  "*.sv"]
-
-# set pkgtoplvlfiles [findFiles ./hw/top_earlgrey  "*_pkg.sv"]
-
-# set hdltoplvlfiles [findFiles ./hw/top_earlgrey  "*.sv"]
-
-set pkgbuildfiles [findFiles ./build_upec/lowrisc_systems_chip_earlgrey_verilator_0.1/src  "*_pkg.sv"]
-
-set hdlbuildfiles [findFiles ./build_upec/lowrisc_systems_chip_earlgrey_verilator_0.1/src  "*.sv"]
-
-# foreach f $pkgIPfiles {
-# 	puts "$f"
-# 	read_verilog -golden  -pragma_ignore {} -version sv2012 $f
-# }
-
-# foreach f $hdlIPfiles {
-# 	puts "$f"
-# 	read_verilog -golden  -pragma_ignore {} -version sv2012 $f
-# }
-
-# foreach f $pkgvendorfiles {
-# 	puts "$f"
-# 	read_verilog -golden  -pragma_ignore {} -version sv2012 $f
-# }
-
-# foreach f $hdlvendorfiles {
-# 	puts "$f"
-# 	read_verilog -golden  -pragma_ignore {} -version sv2012 $f
-# }
-
-# foreach f $pkgtoplvlfiles {
-# 	puts "$f"
-# 	read_verilog -golden  -pragma_ignore {} -version sv2012 $f
-# }
-
-# foreach f $hdltoplvlfiles {
-# 	puts "$f"
-# 	read_verilog -golden  -pragma_ignore {} -version sv2012 $f
-# }
+set hdlbuildfiles [findFiles ./build-onespin/lowrisc_systems_chip_earlgrey_verilator_0.1/src  "*.sv"]
 
 foreach f $pkgbuildfiles {
 	puts "$f"
@@ -100,9 +54,12 @@ foreach f $pkgbuildfiles {
 foreach f $hdlbuildfiles {
 	puts "$f"
 	read_verilog -golden  -pragma_ignore {} -version sv2012 $f
+
 }
 
 read_verilog -golden  -pragma_ignore {} -version sv2012 ./hw/top_earlgrey/rtl/top_level_upec.sv
+
+#set_elaborate_option -top verilog!work.top_earlgrey
 
 set_elaborate_option -top verilog!work.top_level_upec
 
@@ -110,6 +67,8 @@ set_elaborate_option -loop_iter_threshold 1000
 
 elaborate -golden
 
-set_compile_option -macro_iterations 512
+#set_compile_option -golden -time_step macro_force 
+
+#set_compile_option -macro_iterations 1000
 
 compile -golden

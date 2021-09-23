@@ -233,6 +233,17 @@ module chip_earlgrey_verilator (
     .rx_i   (cio_uart_tx_d2p)
   );
 
+    uartdpi #(
+    .BAUD('d7_200),
+    .FREQ('d500_000),
+    .NAME("uart1")
+  ) u_uart1 (
+    .clk_i  (clk_i),
+    .rst_ni (rst_ni),
+    .tx_o   (mio_in[33]),
+    .rx_i   (mio_out[34])
+  );
+
 `ifdef DMIDirectTAP
   // OpenOCD direct DMI TAP
   bind rv_dm dmidpi u_dmidpi (

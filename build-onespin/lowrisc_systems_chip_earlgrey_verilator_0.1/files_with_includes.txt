@@ -1,0 +1,4 @@
+./src/lowrisc_ibex_ibex_core_0.1/rtl/ibex_wb_stage.sv:15:`include "dv_fcov_macros.svh"
+./src/lowrisc_ibex_ibex_core_0.1/rtl/ibex_load_store_unit.sv:15:`include "dv_fcov_macros.svh"
+./src/lowrisc_ibex_ibex_core_0.1/rtl/ibex_controller.sv:11:`include "dv_fcov_macros.svh"
+./src/lowrisc_ibex_ibex_core_0.1/rtl/ibex_id_stage.sv:18:`include "dv_fcov_macros.svh"

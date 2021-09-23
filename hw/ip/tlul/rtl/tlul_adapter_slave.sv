@@ -146,7 +146,7 @@ module tlul_adapter_slave
   .ReqPass(0),
   .RspPass(1),
   .ReqDepth(1),
-  .RspDepth(1)
+  .RspDepth(0)
 ) fifo_i (
   .clk_i,
   .rst_ni,
