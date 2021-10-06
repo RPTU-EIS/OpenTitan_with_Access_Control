@@ -1,7 +1,7 @@
 # Author: Dino Mehmedagić
 
 # Tcl script loads all OpenTitan Earl Grey HDL files with the top_level_upec as the top level file,
-# containing two instances of the Earl Grey chip, for verifivcation with UPEC. The script uses the
+# containing two instances of the Earl Grey chip for verifivcation with UPEC. The script uses the
 # files in opentitan/build/lowrisc_systems_chip_earlgrey_verilator_0.1/src, which contains all the
 # necessary HDL to run the design in OneSpin
 
@@ -41,28 +41,21 @@ restart -force
 cd "~/opentitan"
 
 set_read_hdl_option -golden -verilog_version sv2012
-
 set pkgbuildfiles [findFiles ./build-onespin/lowrisc_systems_chip_earlgrey_verilator_0.1/src  "*_pkg.sv"]
-
 set hdlbuildfiles [findFiles ./build-onespin/lowrisc_systems_chip_earlgrey_verilator_0.1/src  "*.sv"]
 
 foreach f $pkgbuildfiles {
 	puts "$f"
 	read_verilog -golden  -pragma_ignore {} -version sv2012 $f
 }
-
 foreach f $hdlbuildfiles {
 	puts "$f"
 	read_verilog -golden  -pragma_ignore {} -version sv2012 $f
-
 }
-
 read_verilog -golden  -pragma_ignore {} -version sv2012 ./hw/top_earlgrey/rtl/top_level_upec.sv
 
 set_elaborate_option -top verilog!work.top_level_upec
-
 set_elaborate_option -loop_iter_threshold 1000
-
 elaborate -golden
 
 set_compile_option -golden -black_box_instances { {top_earlgrey_1/u_dm_top} {top_earlgrey_1/u_dft_tap_breakout}
@@ -93,10 +86,13 @@ set_compile_option -golden -black_box_instances { {top_earlgrey_1/u_dm_top} {top
                                                 {top_earlgrey_2/u_xbar_peri} }
 
 set_compile_option -golden -black_box { {untrusted_device__INSTANCE_PATHtop_level_upec_top_earlgrey_1_u_untrusted_device} 
-                                                {untrusted_device__INSTANCE_PATHtop_level_upec_top_earlgrey_2_u_untrusted_device} 
-                                                {rv_core_ibex__INSTANCE_PATHtop_level_upec_top_earlgrey_1_u_rv_core_ibex}
-                                                {rv_core_ibex__INSTANCE_PATHtop_level_upec_top_earlgrey_2_u_rv_core_ibex} }
-
+                                                {untrusted_device__INSTANCE_PATHtop_level_upec_top_earlgrey_2_u_untrusted_device} }
+#                                                {rv_core_ibex__INSTANCE_PATHtop_level_upec_top_earlgrey_1_u_rv_core_ibex}
+#                                                {rv_core_ibex__INSTANCE_PATHtop_level_upec_top_earlgrey_2_u_rv_core_ibex} }
 compile -golden
 
+set_clock_spec -period 2 [get_bits -unit -filter clock!=none&&direction==input]
 set_mode mv
+read_sva  {/import/home/mehmedag/opentitan/hw/upec/upec_integrity.sva}
+check -verbose -approver1_steps 1 -approver2_steps 0 -approver3_steps 0 -approver4_steps 0 -disprover1_steps 0 -prover1_steps 0 -prover2_steps 0 -prover_exec_order {{approver1:0 approver1:1 approver1:2 approver1:3 approver1:4 approver1:5 approver1:6 approver1:7 approver1:8}} {sva/checker_inst/ops/upec_assert}
+debug {sva/checker_inst/ops/upec_assert}
