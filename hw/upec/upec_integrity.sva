@@ -124,39 +124,58 @@ module checker_m(
 );
 
 
-//	default clocking default_clk @(posedge top_level_upec.top_earlgrey_1.u_xbar_main.clk_main_i); endclocking
-	default clocking default_clk @(posedge top_level_upec.top_earlgrey_1.u_rv_core_ibex.clk_i); endclocking
+	default clocking default_clk @(posedge top_level_upec.top_earlgrey_1.u_xbar_main.clk_main_i); endclocking
+//	default clocking default_clk @(posedge top_level_upec.top_earlgrey_1.u_rv_core_ibex.clk_i); endclocking
 
 	`include "tidal.sv"
-	`include "counterexamples.sv"
+//	`include "counterexamples.sv"
 	`include "upec_xbar_main_constraints.sv"
-	`include "upec_rv_core_ibex_constraints.sv"
+//	`include "upec_rv_core_ibex_constraints.sv"
 
 	property general_constraints;
-		input_equivalence_xbar_main()	&&
-		input_equivalence_rv_core_ibex();
+		debug_module_is_off_xbar_main()				&&
+//		debug_module_is_off_rv_core_ibex()			&&
+		no_new_reqs_to_untrusted_device_xbar_main()	&&
+		security_enabled_xbar_main()				&&
+		input_equivalence_xbar_main();//				&&
+//		input_equivalence_rv_core_ibex();
+	endproperty
+
+
+	property induction_base;
+		!top_level_upec.top_earlgrey_1.u_xbar_main.rst_main_ni && 
+		!top_level_upec.top_earlgrey_1.u_xbar_main.rst_fixed_ni 
+		|=> async_fifo_flops_legal_xbar_main();
+	endproperty
+
+	property induction_step;
+		async_fifo_flops_legal_xbar_main() |=> async_fifo_flops_legal_xbar_main();
 	endproperty
 		  
 	constraints_assumption: assume property (/* @(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_proc_main) */ general_constraints);
+	induction_base_assert:	assert property (@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_main_infra) induction_base);
+	induction_step_assert:	assert property (@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_main_infra) 
+												disable iff (!top_level_upec.top_earlgrey_1.u_xbar_main.rst_main_ni ||
+															 !top_level_upec.top_earlgrey_1.u_xbar_main.rst_fixed_ni) induction_step);
 
 	`begin_tda(ops)
 
-		property upec_integrity;
-			t ## 0 no_outstanding_reqs_to_untrusted_device_xbar_main()	and
-			t ## 0 security_enabled_xbar_main() 						and
-			t ## 0 micro_soc_state_equivalence_xbar_main() 				and
-			t ## 0 micro_soc_state_equivalence_rv_core_ibex()			and
-				   counterexample_2 									and
-				   counterexample_2_2									and
-				   counterexample_2_2_2									and
-				   counterexample_2_2_3
-			implies
-			t ## 3 visible_soc_state_equivalence_rv_core_ibex();
-		//	t ## 0 core_output_equivalence_xbar_main();
-		endproperty
+	property upec_integrity;
+		t ## 0	no_outstanding_reqs_to_untrusted_device_xbar_main()	and
+//			t ## 0	core_not_in_debug_mode_rv_core_ibex()				and
+		t ## 0	debug_module_has_been_off_xbar_main()				and
+		t ## 0	fifo_ptrs_have_legal_values_xbar_main()				and
+		t ## 0  async_fifo_flops_legal_xbar_main()					and
+		t ## 0	micro_soc_state_equivalence_xbar_main()	//			and
+//			t ## 0	micro_soc_state_equivalence_rv_core_ibex()			and
+//					counterexample_6
+		implies
+		t ## 1 	core_output_equivalence_xbar_main();
+//		t ## 2 visible_soc_state_equivalence_rv_core_ibex();
+	endproperty
 
-		upec_assert: assert property //(@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_main_infra)	 // xbar_main main clk
-									 (@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_proc_main) //rv_core_ibex main clk
+		upec_assert: assert property (@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_main_infra)	 // xbar_main main clk
+									 //(@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_proc_main) //rv_core_ibex main clk
 										disable iff (!top_level_upec.rst_ni || !top_level_upec.scan_rst_ni_1 || !top_level_upec.scan_rst_ni_2) upec_integrity);
 
 	`end_tda

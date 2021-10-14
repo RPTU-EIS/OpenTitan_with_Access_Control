@@ -1,3 +1,21 @@
+function automatic core_not_in_debug_mode_rv_core_ibex();
+    core_not_in_debug_mode_rv_core_ibex = (
+        (top_level_upec.top_earlgrey_1.u_rv_core_ibex.u_core.u_ibex_core.id_stage_i.controller_i.ctrl_fsm_cs != 4'b1000     ||
+         top_level_upec.top_earlgrey_1.u_rv_core_ibex.u_core.u_ibex_core.id_stage_i.controller_i.ctrl_fsm_cs != 4'b1001)    &&
+        !top_level_upec.top_earlgrey_1.u_rv_core_ibex.u_core.u_ibex_core.id_stage_i.controller_i.debug_mode_q               &&
+        (top_level_upec.top_earlgrey_2.u_rv_core_ibex.u_core.u_ibex_core.id_stage_i.controller_i.ctrl_fsm_cs != 4'b1000     ||
+         top_level_upec.top_earlgrey_2.u_rv_core_ibex.u_core.u_ibex_core.id_stage_i.controller_i.ctrl_fsm_cs != 4'b1001)    &&
+        !top_level_upec.top_earlgrey_2.u_rv_core_ibex.u_core.u_ibex_core.id_stage_i.controller_i.debug_mode_q
+    );
+endfunction
+
+function automatic debug_module_is_off_rv_core_ibex();
+    debug_module_is_off_rv_core_ibex = (
+        !top_level_upec.top_earlgrey_1.u_rv_core_ibex.debug_req_i   &&
+        !top_level_upec.top_earlgrey_2.u_rv_core_ibex.debug_req_i
+    );
+endfunction
+
 function automatic clk_gating_disabled();
     clk_gating_disabled = (
         top_level_upec.top_earlgrey_1.u_rv_core_ibex.u_core.clock_en &&

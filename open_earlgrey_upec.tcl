@@ -86,9 +86,9 @@ set_compile_option -golden -black_box_instances { {top_earlgrey_1/u_dm_top} {top
                                                 {top_earlgrey_2/u_xbar_peri} }
 
 set_compile_option -golden -black_box { {untrusted_device__INSTANCE_PATHtop_level_upec_top_earlgrey_1_u_untrusted_device} 
-                                                {untrusted_device__INSTANCE_PATHtop_level_upec_top_earlgrey_2_u_untrusted_device} }
-#                                                {rv_core_ibex__INSTANCE_PATHtop_level_upec_top_earlgrey_1_u_rv_core_ibex}
-#                                                {rv_core_ibex__INSTANCE_PATHtop_level_upec_top_earlgrey_2_u_rv_core_ibex} }
+                                                {untrusted_device__INSTANCE_PATHtop_level_upec_top_earlgrey_2_u_untrusted_device}
+                                                {rv_core_ibex__INSTANCE_PATHtop_level_upec_top_earlgrey_1_u_rv_core_ibex}
+                                                {rv_core_ibex__INSTANCE_PATHtop_level_upec_top_earlgrey_2_u_rv_core_ibex} }
 compile -golden
 
 set_clock_spec -period 2 [get_bits -unit -filter clock!=none&&direction==input]

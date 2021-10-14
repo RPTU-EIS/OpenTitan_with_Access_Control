@@ -548,8 +548,10 @@ module top_earlgrey #(
   tlul_pkg::tl_d2h_t       ram_main_tl_rsp;
   tlul_pkg::tl_h2d_t       eflash_tl_req;
   tlul_pkg::tl_d2h_t       eflash_tl_rsp;
-  tlul_pkg::tl_h2d_t       main_tl_peri_req;
-  tlul_pkg::tl_d2h_t       main_tl_peri_rsp;
+  tlul_pkg::tl_h2d_t       main_tl_peri_secure_req;
+  tlul_pkg::tl_d2h_t       main_tl_peri_secure_rsp;
+  tlul_pkg::tl_h2d_t       main_tl_peri_untrusted_req;
+  tlul_pkg::tl_d2h_t       main_tl_peri_untrusted_rsp;
   tlul_pkg::tl_h2d_t       flash_ctrl_core_tl_req;
   tlul_pkg::tl_d2h_t       flash_ctrl_core_tl_rsp;
   tlul_pkg::tl_h2d_t       flash_ctrl_prim_tl_req;
@@ -663,7 +665,6 @@ module top_earlgrey #(
   otp_ctrl_pkg::otp_en_t       sram_ctrl_ret_aon_otp_en_sram_ifetch;
   bus_ctrl_pkg::master_bits_t  master_bits;
   bus_ctrl_pkg::slave_bits_t   slave_bits;
-  logic                        master_bit_peri;
   logic                        master_bit_peri_en;
   bus_ctrl_pkg::slave_bits_peri_t     slave_bits_peri;
 
@@ -2703,8 +2704,7 @@ module top_earlgrey #(
     .rst_fixed_ni (rstmgr_aon_resets.rst_sys_io_div4_n[rstmgr_pkg::Domain0Sel]),
     .master_bits_i (master_bits),
     .slave_bits_i  (slave_bits),
-    .master_bit_peri_o (master_bit_peri),
-    .master_bit_peri_en_o (master_bit_peri_en),
+    .master_bit_peri_secure_en_o (master_bit_peri_en),
 
     // port: tl_corei
     .tl_corei_i(main_tl_corei_req),
@@ -2742,9 +2742,13 @@ module top_earlgrey #(
     .tl_eflash_o(eflash_tl_req),
     .tl_eflash_i(eflash_tl_rsp),
 
-    // port: tl_peri
-    .tl_peri_o(main_tl_peri_req),
-    .tl_peri_i(main_tl_peri_rsp),
+    // port: tl_peri_secure
+    .tl_peri_secure_o(main_tl_peri_secure_req),
+    .tl_peri_secure_i(main_tl_peri_secure_rsp),
+
+    // port: tl_peri_untrusted
+    .tl_peri_untrusted_o(main_tl_peri_untrusted_req),
+    .tl_peri_untrusted_i(main_tl_peri_untrusted_rsp),
 
     // port: tl_flash_ctrl__core
     .tl_flash_ctrl__core_o(flash_ctrl_core_tl_req),
@@ -2812,13 +2816,16 @@ module top_earlgrey #(
   xbar_peri u_xbar_peri (
     .clk_peri_i (clkmgr_aon_clocks.clk_io_div4_infra),
     .rst_peri_ni (rstmgr_aon_resets.rst_sys_io_div4_n[rstmgr_pkg::Domain0Sel]),
-    .master_bit_peri_i (master_bit_peri),
-    .master_bit_peri_en_i (master_bit_peri_en),
+    .master_bit_peri_secure_en_i (master_bit_peri_en),
     .slave_bits_peri_i (slave_bits_peri),
 
-    // port: tl_main
-    .tl_main_i(main_tl_peri_req),
-    .tl_main_o(main_tl_peri_rsp),
+    // port: tl_main_secure
+    .tl_main_secure_i(main_tl_peri_secure_req),
+    .tl_main_secure_o(main_tl_peri_secure_rsp),
+
+    // port: tl_main_untrusted
+    .tl_main_untrusted_i(main_tl_peri_untrusted_req),
+    .tl_main_untrusted_o(main_tl_peri_untrusted_rsp),
 
     // port: tl_uart0
     .tl_uart0_o(uart0_tl_req),

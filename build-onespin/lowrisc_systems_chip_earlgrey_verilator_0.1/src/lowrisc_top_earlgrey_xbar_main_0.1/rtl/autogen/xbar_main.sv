@@ -147,8 +147,7 @@ module xbar_main (
   input rst_fixed_ni,
   input   bus_ctrl_pkg::master_bits_t master_bits_i,
   input   bus_ctrl_pkg::slave_bits_t  slave_bits_i,
-  output  logic                       master_bit_peri_o,
-  output  logic                       master_bit_peri_en_o,
+  output  logic                       master_bit_peri_secure_en_o,
 
   // Host interfaces
   input  tlul_pkg::tl_h2d_t tl_corei_i,
@@ -171,8 +170,10 @@ module xbar_main (
   input  tlul_pkg::tl_d2h_t tl_ram_main_i,
   output tlul_pkg::tl_h2d_t tl_eflash_o,
   input  tlul_pkg::tl_d2h_t tl_eflash_i,
-  output tlul_pkg::tl_h2d_t tl_peri_o,
-  input  tlul_pkg::tl_d2h_t tl_peri_i,
+  output tlul_pkg::tl_h2d_t tl_peri_secure_o,
+  input  tlul_pkg::tl_d2h_t tl_peri_secure_i,
+  output tlul_pkg::tl_h2d_t tl_peri_untrusted_o,
+  input  tlul_pkg::tl_d2h_t tl_peri_untrusted_i,
   output tlul_pkg::tl_h2d_t tl_flash_ctrl__core_o,
   input  tlul_pkg::tl_d2h_t tl_flash_ctrl__core_i,
   output tlul_pkg::tl_h2d_t tl_flash_ctrl__prim_o,
@@ -270,17 +271,32 @@ module xbar_main (
   tl_h2d_t tl_sm1_31_ds_h2d ;
   tl_d2h_t tl_sm1_31_ds_d2h ;
 
-  tl_h2d_t tl_asf_32_us_h2d ;
-  tl_d2h_t tl_asf_32_us_d2h ;
-  tl_h2d_t tl_asf_32_ds_h2d ;
-  tl_d2h_t tl_asf_32_ds_d2h ;
+  tl_h2d_t tl_asf_32_secure_us_h2d ;
+  tl_d2h_t tl_asf_32_secure_us_d2h ;
 
+  tl_h2d_t tl_asf_32_secure_ds_h2d ;
+  tl_d2h_t tl_asf_32_secure_ds_d2h ;
+
+  tl_h2d_t tl_asf_32_untrusted_us_h2d ;
+  tl_d2h_t tl_asf_32_untrusted_us_d2h ;
+
+  tl_h2d_t tl_asf_32_untrusted_ds_h2d ;
+  tl_d2h_t tl_asf_32_untrusted_ds_d2h ;
 
   tl_h2d_t tl_sm1_33_us_h2d [3];
   tl_d2h_t tl_sm1_33_us_d2h [3];
 
-  tl_h2d_t tl_sm1_33_ds_h2d ;
-  tl_d2h_t tl_sm1_33_ds_d2h ;
+  tl_h2d_t tl_sm1_33_secure_us_h2d [3];
+  tl_d2h_t tl_sm1_33_secure_us_d2h [3];
+
+  tl_h2d_t tl_sm1_33_secure_ds_h2d ;
+  tl_d2h_t tl_sm1_33_secure_ds_d2h ;
+
+  tl_h2d_t tl_sm1_33_untrusted_us_h2d ;
+  tl_d2h_t tl_sm1_33_untrusted_us_d2h ;
+
+  tl_h2d_t tl_sm1_33_untrusted_ds_h2d ;
+  tl_d2h_t tl_sm1_33_untrusted_ds_d2h ;
 
 
   tl_h2d_t tl_sm1_34_us_h2d [3];
@@ -407,7 +423,7 @@ module xbar_main (
   // Create steering signal
   logic [4:0] dev_sel_s1n_50;
 
-  logic master_bits_peri, master_bits_peri_en;
+  logic master_bits_peri_secure_en;
 
 
 
@@ -615,11 +631,17 @@ module xbar_main (
   assign tl_rom_ctrl__regs_o = tl_sm1_31_ds_h2d;
   assign tl_sm1_31_ds_d2h = tl_rom_ctrl__regs_i;
 
-  assign tl_peri_o = tl_asf_32_ds_h2d;
-  assign tl_asf_32_ds_d2h = tl_peri_i;
+  assign tl_peri_secure_o = tl_asf_32_secure_ds_h2d;
+  assign tl_asf_32_secure_ds_d2h = tl_peri_secure_i;
 
-  assign tl_asf_32_us_h2d = tl_sm1_33_ds_h2d;
-  assign tl_sm1_33_ds_d2h = tl_asf_32_us_d2h;
+  assign tl_peri_untrusted_o = tl_asf_32_untrusted_ds_h2d;
+  assign tl_asf_32_untrusted_ds_d2h = tl_peri_untrusted_i;
+
+  assign tl_asf_32_secure_us_h2d = tl_sm1_33_secure_ds_h2d;
+  assign tl_sm1_33_secure_ds_d2h = tl_asf_32_secure_us_d2h;
+
+  assign tl_asf_32_untrusted_us_h2d = tl_sm1_33_untrusted_ds_h2d;
+  assign tl_sm1_33_untrusted_ds_d2h = tl_asf_32_untrusted_us_d2h;
 
   assign tl_flash_ctrl__core_o = tl_sm1_34_ds_h2d;
   assign tl_sm1_34_ds_d2h = tl_flash_ctrl__core_i;
@@ -875,8 +897,7 @@ end
     // default steering to generate error response if address is not within the range
     dev_sel_s1n_50 = 5'd16;
     // extra protection mechanism from bus_ctrl registers is implemented
-    master_bits_peri_en = '0;
-    master_bits_peri    = '0;
+    master_bits_peri_secure_en = '0;
     if ((tl_s1n_50_us_h2d.a_address &
          ~(ADDR_MASK_RAM_MAIN)) == ADDR_SPACE_RAM_MAIN &&
          master_bits_i.untrusted_m == slave_bits_i.ram_main) begin
@@ -891,8 +912,7 @@ end
       ((tl_s1n_50_us_h2d.a_address & ~(ADDR_MASK_PERI[0])) == ADDR_SPACE_PERI[0]) ||
       ((tl_s1n_50_us_h2d.a_address & ~(ADDR_MASK_PERI[1])) == ADDR_SPACE_PERI[1])) begin
       dev_sel_s1n_50      = 5'd2;
-      master_bits_peri_en = tl_untrusted_m_i.a_valid & tl_untrusted_m_o.a_ready;
-      master_bits_peri    = master_bits_i.untrusted_m;
+      master_bits_peri_secure_en = tl_untrusted_m_i.a_valid & tl_untrusted_m_o.a_ready & master_bits_i.untrusted_m;
 
     end else if ((tl_s1n_50_us_h2d.a_address &
                   ~(ADDR_MASK_FLASH_CTRL__CORE)) == ADDR_SPACE_FLASH_CTRL__CORE &&
@@ -1063,38 +1083,139 @@ end
     .tl_d_o       (tl_sm1_31_ds_h2d),
     .tl_d_i       (tl_sm1_31_ds_d2h)
   );
+
   tlul_fifo_async #(
     .ReqDepth        (4),// At least 4 to make async work
-    .RspDepth        (4),// At least 4 to make async work
-    .SpareReqW       (2)
-  ) u_asf_32 (
+    .RspDepth        (4)// At least 4 to make async work
+  ) u_asf_32_secure (
     .clk_h_i      (clk_main_i),
     .rst_h_ni     (rst_main_ni),
     .clk_d_i      (clk_fixed_i),
     .rst_d_ni     (rst_fixed_ni),
-    .tl_h_i       (tl_asf_32_us_h2d),
-    .tl_h_o       (tl_asf_32_us_d2h),
-    .tl_d_o       (tl_asf_32_ds_h2d),
-    .tl_d_i       (tl_asf_32_ds_d2h),
-    .spare_req_i  ({master_bits_peri_en, master_bits_peri}),
-    .spare_req_o  ({master_bit_peri_en_o, master_bit_peri_o}),
+    .tl_h_i       (tl_asf_32_secure_us_h2d),
+    .tl_h_o       (tl_asf_32_secure_us_d2h),
+    .tl_d_o       (tl_asf_32_secure_ds_h2d),
+    .tl_d_i       (tl_asf_32_secure_ds_d2h),
+    .spare_req_i  (master_bits_peri_secure_en),
+    .spare_req_o  (master_bit_peri_secure_en_o),
     .spare_rsp_i  (1'b0),
     .spare_rsp_o  ()
   );
+  tlul_fifo_async #(
+    .ReqDepth        (4),// At least 4 to make async work
+    .RspDepth        (4)// At least 4 to make async work
+  ) u_asf_32_untrusted (
+    .clk_h_i      (clk_main_i),
+    .rst_h_ni     (rst_main_ni),
+    .clk_d_i      (clk_fixed_i),
+    .rst_d_ni     (rst_fixed_ni),
+    .tl_h_i       (tl_asf_32_untrusted_us_h2d),
+    .tl_h_o       (tl_asf_32_untrusted_us_d2h),
+    .tl_d_o       (tl_asf_32_untrusted_ds_h2d),
+    .tl_d_i       (tl_asf_32_untrusted_ds_d2h),
+    .spare_req_i  (1'b0),
+    .spare_req_o  (),
+    .spare_rsp_i  (1'b0),
+    .spare_rsp_o  ()
+  );
+
+  // All master messages to/from the peripheral crossbar are routed to/from a secure or untrusted line
+  assign tl_sm1_33_secure_us_h2d[0:1] = tl_sm1_33_us_h2d[0:1];
+  assign tl_sm1_33_us_d2h[0:1]        = tl_sm1_33_secure_us_d2h[0:1];
+
+  always_comb begin
+    if (master_bits_i.untrusted_m) begin
+      tl_sm1_33_secure_us_h2d[2].a_valid      = tl_sm1_33_us_h2d[2].a_valid;
+      tl_sm1_33_secure_us_h2d[2].a_opcode     = tl_sm1_33_us_h2d[2].a_opcode;
+      tl_sm1_33_secure_us_h2d[2].a_param      = tl_sm1_33_us_h2d[2].a_param;
+      tl_sm1_33_secure_us_h2d[2].a_size       = tl_sm1_33_us_h2d[2].a_size;
+      tl_sm1_33_secure_us_h2d[2].a_source     = tl_sm1_33_us_h2d[2].a_source;
+      tl_sm1_33_secure_us_h2d[2].a_address    = tl_sm1_33_us_h2d[2].a_address;
+      tl_sm1_33_secure_us_h2d[2].a_mask       = tl_sm1_33_us_h2d[2].a_mask;
+      tl_sm1_33_secure_us_h2d[2].a_data       = tl_sm1_33_us_h2d[2].a_data;
+      tl_sm1_33_secure_us_h2d[2].a_user       = tl_sm1_33_us_h2d[2].a_user;
+      tl_sm1_33_us_d2h[2].a_ready             = tl_sm1_33_secure_us_d2h[2].a_ready;
+
+      tl_sm1_33_untrusted_us_h2d.a_valid   = '0;
+      tl_sm1_33_untrusted_us_h2d.a_opcode  = '0;
+      tl_sm1_33_untrusted_us_h2d.a_param   = '0;
+      tl_sm1_33_untrusted_us_h2d.a_size    = '0;
+      tl_sm1_33_untrusted_us_h2d.a_source  = '0;
+      tl_sm1_33_untrusted_us_h2d.a_address = '0;
+      tl_sm1_33_untrusted_us_h2d.a_mask    = '0;
+      tl_sm1_33_untrusted_us_h2d.a_data    = '0;
+      tl_sm1_33_untrusted_us_h2d.a_user    = '0;
+
+    end else begin
+      tl_sm1_33_untrusted_us_h2d.a_valid   = tl_sm1_33_us_h2d[2].a_valid;
+      tl_sm1_33_untrusted_us_h2d.a_opcode  = tl_sm1_33_us_h2d[2].a_opcode;
+      tl_sm1_33_untrusted_us_h2d.a_param   = tl_sm1_33_us_h2d[2].a_param;
+      tl_sm1_33_untrusted_us_h2d.a_size    = tl_sm1_33_us_h2d[2].a_size;
+      tl_sm1_33_untrusted_us_h2d.a_source  = tl_sm1_33_us_h2d[2].a_source;
+      tl_sm1_33_untrusted_us_h2d.a_address = tl_sm1_33_us_h2d[2].a_address;
+      tl_sm1_33_untrusted_us_h2d.a_mask    = tl_sm1_33_us_h2d[2].a_mask;
+      tl_sm1_33_untrusted_us_h2d.a_data    = tl_sm1_33_us_h2d[2].a_data;
+      tl_sm1_33_untrusted_us_h2d.a_user    = tl_sm1_33_us_h2d[2].a_user;
+      tl_sm1_33_us_d2h[2].a_ready          = tl_sm1_33_untrusted_us_d2h.a_ready;
+
+      tl_sm1_33_secure_us_h2d[2].a_valid      = '0;
+      tl_sm1_33_secure_us_h2d[2].a_opcode     = '0;
+      tl_sm1_33_secure_us_h2d[2].a_param      = '0;
+      tl_sm1_33_secure_us_h2d[2].a_size       = '0;
+      tl_sm1_33_secure_us_h2d[2].a_source     = '0;
+      tl_sm1_33_secure_us_h2d[2].a_address    = '0;
+      tl_sm1_33_secure_us_h2d[2].a_mask       = '0;
+      tl_sm1_33_secure_us_h2d[2].a_data       = '0;
+      tl_sm1_33_secure_us_h2d[2].a_user       = '0;
+    end
+  end
+
+  always_comb begin
+    if (tl_sm1_33_secure_us_d2h[2].d_valid) begin
+      tl_sm1_33_us_d2h[2].d_valid           = tl_sm1_33_secure_us_d2h[2].d_valid;
+      tl_sm1_33_us_d2h[2].d_opcode          = tl_sm1_33_secure_us_d2h[2].d_opcode;
+      tl_sm1_33_us_d2h[2].d_param           = tl_sm1_33_secure_us_d2h[2].d_param;
+      tl_sm1_33_us_d2h[2].d_size            = tl_sm1_33_secure_us_d2h[2].d_size;
+      tl_sm1_33_us_d2h[2].d_source          = tl_sm1_33_secure_us_d2h[2].d_source;
+      tl_sm1_33_us_d2h[2].d_sink            = tl_sm1_33_secure_us_d2h[2].d_sink;
+      tl_sm1_33_us_d2h[2].d_data            = tl_sm1_33_secure_us_d2h[2].d_data;
+      tl_sm1_33_us_d2h[2].d_user            = tl_sm1_33_secure_us_d2h[2].d_user;
+      tl_sm1_33_us_d2h[2].d_error           = tl_sm1_33_secure_us_d2h[2].d_error;
+      tl_sm1_33_secure_us_h2d[2].d_ready    = tl_sm1_33_us_h2d[2].d_ready;
+      tl_sm1_33_untrusted_us_h2d.d_ready = 1'b0;
+    end else begin
+      tl_sm1_33_us_d2h[2].d_valid           = tl_sm1_33_untrusted_us_d2h.d_valid;
+      tl_sm1_33_us_d2h[2].d_opcode          = tl_sm1_33_untrusted_us_d2h.d_opcode;
+      tl_sm1_33_us_d2h[2].d_param           = tl_sm1_33_untrusted_us_d2h.d_param;
+      tl_sm1_33_us_d2h[2].d_size            = tl_sm1_33_untrusted_us_d2h.d_size;
+      tl_sm1_33_us_d2h[2].d_source          = tl_sm1_33_untrusted_us_d2h.d_source;
+      tl_sm1_33_us_d2h[2].d_sink            = tl_sm1_33_untrusted_us_d2h.d_sink;
+      tl_sm1_33_us_d2h[2].d_data            = tl_sm1_33_untrusted_us_d2h.d_data;
+      tl_sm1_33_us_d2h[2].d_user            = tl_sm1_33_untrusted_us_d2h.d_user;
+      tl_sm1_33_us_d2h[2].d_error           = tl_sm1_33_untrusted_us_d2h.d_error;
+      tl_sm1_33_untrusted_us_h2d.d_ready = tl_sm1_33_us_h2d[2].d_ready;
+      tl_sm1_33_secure_us_h2d[2].d_ready    = 1'b0;
+  end
+end
+
   tlul_socket_m1 #(
     .HReqDepth (12'h0),
     .HRspDepth (12'h0),
     .DReqDepth (4'h0),
     .DRspDepth (4'h0),
     .M         (3)
-  ) u_sm1_33 (
+  ) u_sm1_33_secure (
     .clk_i        (clk_main_i),
     .rst_ni       (rst_main_ni),
-    .tl_h_i       (tl_sm1_33_us_h2d),
-    .tl_h_o       (tl_sm1_33_us_d2h),
-    .tl_d_o       (tl_sm1_33_ds_h2d),
-    .tl_d_i       (tl_sm1_33_ds_d2h)
+    .tl_h_i       (tl_sm1_33_secure_us_h2d),
+    .tl_h_o       (tl_sm1_33_secure_us_d2h),
+    .tl_d_o       (tl_sm1_33_secure_ds_h2d),
+    .tl_d_i       (tl_sm1_33_secure_ds_d2h)
   );
+
+  assign tl_sm1_33_untrusted_ds_h2d = tl_sm1_33_untrusted_us_h2d;
+  assign tl_sm1_33_untrusted_us_d2h = tl_sm1_33_untrusted_ds_d2h;
+
   tlul_socket_m1 #(
     .HReqDepth (12'h0),
     .HRspDepth (12'h0),
