@@ -8,20 +8,11 @@
 
 module checker_m(
 // BEGIN OSS_PORT: DO NOT EDIT THIS SECTION! IT IS AUTOMATICALLY GENERATED AND UPDATED BY COMMAND 'CREATE_SVA_MODULE'
-	input dio_in_1,
-	input dio_in_2,
-	input dio_oe_1,
-	input dio_oe_2,
-	input dio_out_1,
-	input dio_out_2,
+
 	input[1:0] flash_test_mode_a_io_1,
 	input[1:0] flash_test_mode_a_io_2,
 	input flash_test_voltage_h_io_1,
 	input flash_test_voltage_h_io_2,
-	input mio_oe_1,
-	input mio_oe_2,
-	input mio_out_1,
-	input mio_out_2,
 	input otp_ext_voltage_h_io_1,
 	input otp_ext_voltage_h_io_2,
 	input struct packed {logic[1:0] channel_sel; logic pd; } adc_req_o_1,
@@ -123,61 +114,103 @@ module checker_m(
 // END OSS_PORT: 113
 );
 
-
-	default clocking default_clk @(posedge top_level_upec.top_earlgrey_1.u_xbar_main.clk_main_i); endclocking
+//default clocking default_clk @(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_main_infra); endclocking
+//	default clocking default_clk @(posedge top_level_upec.top_earlgrey_1.u_xbar_main.clk_main_i); endclocking
 //	default clocking default_clk @(posedge top_level_upec.top_earlgrey_1.u_rv_core_ibex.clk_i); endclocking
 
 	`include "tidal.sv"
 //	`include "counterexamples.sv"
+	`include "primary_io_constraints.sv"
 	`include "upec_xbar_main_constraints.sv"
+//  `include "upec_sram_ctrl_main_constraints.sv"
 //	`include "upec_rv_core_ibex_constraints.sv"
+//    `include "upec_rv_dm_constraints.sv"
+//	`include "upec_xbar_peri_constraints.sv"
+//	`include "upec_peripheral_devices_constraints.sv"
+//	`include "upec_ram_ret_aon_constraints.sv"
 
 	property general_constraints;
-		debug_module_is_off_xbar_main()				&&
-//		debug_module_is_off_rv_core_ibex()			&&
-		no_new_reqs_to_untrusted_device_xbar_main()	&&
-		security_enabled_xbar_main()				&&
-		input_equivalence_xbar_main();//				&&
-//		input_equivalence_rv_core_ibex();
+		primary_input_equivalence()								&&
+		untrusted_master_cannot_stall_xbar_main()				&&
+		debug_module_is_off_xbar_main()							&&
+		no_new_reqs_to_untrusted_device_xbar_main()				&&
+		trusted_slaves_dont_send_rsps_without_reqs_xbar_main()	&&
+		security_enabled_xbar_main()							&&
+		input_equivalence_xbar_main()							&&
+		untrusted_slave_valid_input_equivalence_xbar_main()		&&
+		untrusted_master_input_equivalence_xbar_main();
 	endproperty
-
 
 	property induction_base;
 		!top_level_upec.top_earlgrey_1.u_xbar_main.rst_main_ni && 
 		!top_level_upec.top_earlgrey_1.u_xbar_main.rst_fixed_ni 
-		|=> async_fifo_flops_legal_xbar_main();
+		|=> rspfifo_less_or_equal_num_req_xbar_main();
 	endproperty
 
 	property induction_step;
-		async_fifo_flops_legal_xbar_main() |=> async_fifo_flops_legal_xbar_main();
+		rspfifo_less_or_equal_num_req_xbar_main() |=> rspfifo_less_or_equal_num_req_xbar_main();
 	endproperty
 		  
 	constraints_assumption: assume property (/* @(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_proc_main) */ general_constraints);
-	induction_base_assert:	assert property (@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_main_infra) induction_base);
-	induction_step_assert:	assert property (@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_main_infra) 
-												disable iff (!top_level_upec.top_earlgrey_1.u_xbar_main.rst_main_ni ||
-															 !top_level_upec.top_earlgrey_1.u_xbar_main.rst_fixed_ni) induction_step);
+//	induction_base_assert:	assert property (@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_main_infra) induction_base);
+//	induction_step_assert:	assert property (@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_main_infra) 
+//												disable iff (!top_level_upec.top_earlgrey_1.u_xbar_main.rst_main_ni ||
+//															 !top_level_upec.top_earlgrey_1.u_xbar_main.rst_fixed_ni) induction_step);
 
 	`begin_tda(ops)
 
-	property upec_integrity;
-		t ## 0	no_outstanding_reqs_to_untrusted_device_xbar_main()	and
-//			t ## 0	core_not_in_debug_mode_rv_core_ibex()				and
-		t ## 0	debug_module_has_been_off_xbar_main()				and
-		t ## 0	fifo_ptrs_have_legal_values_xbar_main()				and
-		t ## 0  async_fifo_flops_legal_xbar_main()					and
-		t ## 0	micro_soc_state_equivalence_xbar_main()	//			and
-//			t ## 0	micro_soc_state_equivalence_rv_core_ibex()			and
-//					counterexample_6
+	property upec_base;
+		t ## 0	no_outstanding_reqs_to_untrusted_device_xbar_main()		and
+		t ## 0	debug_module_has_been_off_xbar_main()					and
+		t ## 0	fifo_ptrs_have_legal_values_xbar_main()					and
+		t ## 0  async_fifo_flops_legal_xbar_main()						and
+		t ## 0  rspfifo_less_or_equal_num_req_xbar_main()				and
+		t ## 0  no_secure_rsps_bound_to_untrusted_master_xbar_main()	and
+		t ## 0	micro_soc_state_equivalence_xbar_main()					and
+		t ## 1  untrusted_input_equivalence_xbar_main()
 		implies
-		t ## 1 	core_output_equivalence_xbar_main();
-//		t ## 2 visible_soc_state_equivalence_rv_core_ibex();
+//		t ## 1  primary_output_equivalence();
+		t ## 1	output_equivalence_xbar_main()							and
+		t ## 1	soc_state_equivalence_xbar_main();
 	endproperty
 
-		upec_assert: assert property (@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_main_infra)	 // xbar_main main clk
-									 //(@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_proc_main) //rv_core_ibex main clk
-										disable iff (!top_level_upec.rst_ni || !top_level_upec.scan_rst_ni_1 || !top_level_upec.scan_rst_ni_2) upec_integrity);
+	property upec_step;
+		t ## 0  under_rst_is_low_xbar_main()							and
+		t ## 0	no_outstanding_reqs_to_untrusted_device_xbar_main()		and
+		t ## 0	debug_module_has_been_off_xbar_main()					and
+		t ## 0	fifo_ptrs_have_legal_values_xbar_main()					and
+		t ## 0  async_fifo_flops_legal_xbar_main()						and
+		t ## 0  rspfifo_less_or_equal_num_req_xbar_main()				and
+		t ## 0  no_secure_rsps_bound_to_untrusted_master_xbar_main()	and
+		t ## 0  soc_state_equivalence_xbar_main()						and
+		t ## 0  untrusted_input_equivalence_xbar_main()
+		implies
+		t ## 1  soc_state_equivalence_xbar_main();
+	endproperty
 
+		upec_base_assert: assert property //(@(posedge top_level_upec.clk_i)	// entry clock
+									 (@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_main_infra)	 // xbar_main main clk
+									 //(@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_main_secure) // sram_ctrl main clk
+									 //(@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_proc_main) //rv_core_ibex main clk
+									//	disable iff (!top_level_upec.rst_ni || !top_level_upec.scan_rst_ni_1 || !top_level_upec.scan_rst_ni_2) upec_base);
+									 disable iff (!top_level_upec.top_earlgrey_1.u_xbar_main.rst_main_ni || !top_level_upec.top_earlgrey_2.u_xbar_main.rst_main_ni ||
+									 				!top_level_upec.top_earlgrey_1.u_xbar_main.rst_fixed_ni || !top_level_upec.top_earlgrey_2.u_xbar_main.rst_fixed_ni) upec_base);
+													//|| !top_level_upec.top_earlgrey_1.u_dm_top.rst_ni || !top_level_upec.top_earlgrey_2.u_dm_top.rst_ni	||
+													//!top_level_upec.top_earlgrey_1.u_dm_top.scan_rst_ni || !top_level_upec.top_earlgrey_2.u_dm_top.scan_rst_ni)		upec_base);
+													//!top_level_upec.top_earlgrey_1.u_sram_ctrl_main.rst_ni || !top_level_upec.top_earlgrey_1.u_sram_ctrl_main.rst_otp_ni	||
+													//!top_level_upec.top_earlgrey_2.u_sram_ctrl_main.rst_ni || !top_level_upec.top_earlgrey_2.u_sram_ctrl_main.rst_otp_ni)  upec_base);
+
+		upec_step_assert: assert property //(@(posedge top_level_upec.clk_i)	// entry clock
+									 (@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_main_infra)	 // xbar_main main clk
+									 //(@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_main_secure) // sram_ctrl main clk
+									 //(@(posedge top_level_upec.top_earlgrey_1.u_clkmgr_aon.clocks_o.clk_proc_main) //rv_core_ibex main clk
+									//	disable iff (!top_level_upec.rst_ni || !top_level_upec.scan_rst_ni_1 || !top_level_upec.scan_rst_ni_2) upec_step);
+									 disable iff (!top_level_upec.top_earlgrey_1.u_xbar_main.rst_main_ni || !top_level_upec.top_earlgrey_2.u_xbar_main.rst_main_ni ||
+									 				!top_level_upec.top_earlgrey_1.u_xbar_main.rst_fixed_ni || !top_level_upec.top_earlgrey_2.u_xbar_main.rst_fixed_ni) upec_step);
+													//|| !top_level_upec.top_earlgrey_1.u_dm_top.rst_ni || !top_level_upec.top_earlgrey_2.u_dm_top.rst_ni	||
+													//!top_level_upec.top_earlgrey_1.u_dm_top.scan_rst_ni || !top_level_upec.top_earlgrey_2.u_dm_top.scan_rst_ni)		upec_step);
+													//!top_level_upec.top_earlgrey_1.u_sram_ctrl_main.rst_ni || !top_level_upec.top_earlgrey_1.u_sram_ctrl_main.rst_otp_ni	||
+													//!top_level_upec.top_earlgrey_2.u_sram_ctrl_main.rst_ni || !top_level_upec.top_earlgrey_2.u_sram_ctrl_main.rst_otp_ni)  upec_step);
 	`end_tda
 
 
@@ -185,20 +218,10 @@ endmodule
 
 bind top_level_upec checker_m checker_inst (
 // BEGIN OSS_BIND: DO NOT EDIT THIS SECTION! IT IS AUTOMATICALLY GENERATED AND UPDATED BY COMMAND 'CREATE_SVA_MODULE'
-	.dio_in_1(dio_in_1),
-	.dio_in_2(dio_in_2),
-	.dio_oe_1(dio_oe_1),
-	.dio_oe_2(dio_oe_2),
-	.dio_out_1(dio_out_1),
-	.dio_out_2(dio_out_2),
 	.flash_test_mode_a_io_1(flash_test_mode_a_io_1),
 	.flash_test_mode_a_io_2(flash_test_mode_a_io_2),
 	.flash_test_voltage_h_io_1(flash_test_voltage_h_io_1),
 	.flash_test_voltage_h_io_2(flash_test_voltage_h_io_2),
-	.mio_oe_1(mio_oe_1),
-	.mio_oe_2(mio_oe_2),
-	.mio_out_1(mio_out_1),
-	.mio_out_2(mio_out_2),
 	.otp_ext_voltage_h_io_1(otp_ext_voltage_h_io_1),
 	.otp_ext_voltage_h_io_2(otp_ext_voltage_h_io_2),
 	.adc_req_o_1(adc_req_o_1),

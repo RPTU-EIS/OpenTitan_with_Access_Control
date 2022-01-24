@@ -46,6 +46,7 @@ module tlul_socket_1n #(
   parameter bit [3:0]     HRspDepth = 4'h2,
   parameter bit [N*4-1:0] DReqDepth = {N{4'h2}},
   parameter bit [N*4-1:0] DRspDepth = {N{4'h2}},
+  parameter bit           PreventOverwhelming = 1'b0,
   localparam int unsigned NWD       = $clog2(N+1) // derived parameter
 ) (
   input                     clk_i,
@@ -117,9 +118,16 @@ module tlul_socket_1n #(
     end
   end
 
-  assign hold_all_requests =
+  if (PreventOverwhelming) begin
+    assign hold_all_requests =
       (num_req_outstanding != '0) &
-      (dev_select_t != dev_select_outstanding);
+      (dev_select_t != dev_select_outstanding)  |
+      (num_req_outstanding >= HRspDepth - fifo_h.rspfifo.depth_o);
+  end else begin
+    assign hold_all_requests =
+    (num_req_outstanding != '0) &
+    (dev_select_t != dev_select_outstanding);
+  end
 
   // Make N copies of 't' request side with modified reqvalid, call
   // them 'u[0]' .. 'u[n-1]'.

@@ -1,0 +1,3 @@
+    approver1:2   0     done            1/1           14,00 sec 17456.70 MB  hold_bounded (0)
+    Vars(154872) Nodes(240878)
+    Nodes(946785) Inputs(13824) Flops(138366) TransitiveFlops(13824)

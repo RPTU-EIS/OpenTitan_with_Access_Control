@@ -1,3 +1,210 @@
+function automatic under_rst_is_low_xbar_main();
+    under_rst_is_low_xbar_main = (
+        !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.under_rst    &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.under_rst
+    );
+endfunction
+
+function no_secure_rsps_sent_to_untrusted_master_xbar_main();
+    no_secure_rsps_sent_to_untrusted_master_xbar_main = (
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_peri_untrusted_i.d_source[1:0]   != 1'b10
+    );
+endfunction
+
+function no_secure_rsps_bound_to_untrusted_master_xbar_main();
+    no_secure_rsps_bound_to_untrusted_master_xbar_main = (
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_secure.rspfifo.storage[0][50:49]  != 2'b10    &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_secure.rspfifo.storage[1][50:49]  != 2'b10    &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_secure.rspfifo.storage[2][50:49]  != 2'b10    &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_secure.rspfifo.storage[3][50:49]  != 2'b10    &&
+        top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_secure.rspfifo.storage[0][50:49]  != 2'b10    &&
+        top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_secure.rspfifo.storage[1][50:49]  != 2'b10    &&
+        top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_secure.rspfifo.storage[2][50:49]  != 2'b10    &&
+        top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_secure.rspfifo.storage[3][50:49]  != 2'b10    &&
+
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_secure.reqfifo.storage[0][91:90]  != 2'b10    &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_secure.reqfifo.storage[1][91:90]  != 2'b10    &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_secure.reqfifo.storage[2][91:90]  != 2'b10    &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_secure.reqfifo.storage[3][91:90]  != 2'b10    &&
+        top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_secure.reqfifo.storage[0][91:90]  != 2'b10    &&
+        top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_secure.reqfifo.storage[1][91:90]  != 2'b10    &&
+        top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_secure.reqfifo.storage[2][91:90]  != 2'b10    &&
+        top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_secure.reqfifo.storage[3][91:90]  != 2'b10
+    );
+endfunction
+
+function automatic rspfifo_less_or_equal_num_req_xbar_main();
+    rspfifo_less_or_equal_num_req_xbar_main = (
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.fifo_h.rspfifo.depth_o       +
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.wdepth_o   <=
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.num_req_outstanding          &&
+        top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.fifo_h.rspfifo.depth_o       +
+        top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.wdepth_o   <=
+        top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.num_req_outstanding
+    );
+endfunction
+
+function automatic trusted_slaves_dont_send_rsps_without_reqs_xbar_main();
+    trusted_slaves_dont_send_rsps_without_reqs_xbar_main = (
+        (top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_25.num_req_outstanding != '0   ||
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_25.tl_d_i[0].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_25.tl_d_i[1].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_25.tl_d_i[2].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_25.tl_d_i[3].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_25.tl_u_i[4].d_valid
+        )                                                                               &&
+        (top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.num_req_outstanding != '0   ||
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[0].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[1].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[2].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[3].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[4].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[5].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[6].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[7].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[8].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[9].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[10].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[11].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[12].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[13].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[14].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[15].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[16].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[17].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[18].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[19].d_valid         &&
+//         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_d_i[20].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.tl_u_i[21].d_valid
+        )                                                                               &&
+        (top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.num_req_outstanding != '0   ||
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[0].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[1].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[2].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[3].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[4].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[5].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[6].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[7].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[8].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[9].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[10].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[11].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[12].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[13].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[14].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[15].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[16].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[17].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[18].d_valid         &&
+//         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_d_i[19].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.tl_u_i[20].d_valid
+        )                                                                               &&
+        (top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.num_req_outstanding  != '0   ||
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_d_i[0].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_d_i[1].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_d_i[2].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_d_i[3].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_d_i[4].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_d_i[5].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_d_i[6].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_d_i[7].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_d_i[8].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_d_i[9].d_valid          &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_d_i[10].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_d_i[11].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_d_i[12].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_d_i[13].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_d_i[14].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_d_i[15].d_valid         &&
+         !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_u_i[16].d_valid
+        )                                                                               &&
+        (top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_25.num_req_outstanding != '0   ||
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_25.tl_d_i[0].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_25.tl_d_i[1].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_25.tl_d_i[2].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_25.tl_d_i[3].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_25.tl_u_i[4].d_valid
+       )                                                                                &&
+       (top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.num_req_outstanding != '0    ||
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[0].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[1].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[2].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[3].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[4].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[5].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[6].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[7].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[8].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[9].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[10].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[11].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[12].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[13].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[14].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[15].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[16].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[17].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[18].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[19].d_valid         &&
+//         !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_d_i[20].d_valid         &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.tl_u_i[21].d_valid
+       )                                                                                &&
+       (top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.num_req_outstanding != '0    ||
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[0].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[1].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[2].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[3].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[4].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[5].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[6].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[7].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[8].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[9].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[10].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[11].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[12].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[13].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[14].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[15].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[16].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[17].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[18].d_valid         &&
+//         !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_d_i[19].d_valid         &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.tl_u_i[20].d_valid
+       )                                                                                &&
+       (top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.num_req_outstanding  != '0   ||
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_d_i[0].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_d_i[1].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_d_i[2].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_d_i[3].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_d_i[4].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_d_i[5].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_d_i[6].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_d_i[7].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_d_i[8].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_d_i[9].d_valid           &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_d_i[10].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_d_i[11].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_d_i[12].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_d_i[13].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_d_i[14].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_d_i[15].d_valid          &&
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_u_i[16].d_valid
+       )
+    );
+endfunction
+
+function automatic untrusted_master_cannot_stall_xbar_main();
+    untrusted_master_cannot_stall_xbar_main = (
+       (!top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.full ||
+        !top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.tl_h_o.d_valid)                     &&
+       (!top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.full ||
+        !top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.tl_h_o.d_valid)
+   );
+endfunction
+  
+  
   // Algorithm walks up from 0..N-1 then flips the upper bit and walks down from N-1 to 0.
 function automatic [3:0] gray2dec(input logic [3:0] grayval);
     logic [3:0] dec_tmp, dec_tmp_sub;
@@ -131,7 +338,10 @@ function automatic fifo_ptrs_have_legal_values_xbar_main();
         top_level_upec.top_earlgrey_1.u_xbar_main.u_sm1_44.u_devicefifo.reqfifo.gen_normal_fifo.fifo_rptr   != top_level_upec.top_earlgrey_1.u_xbar_main.u_sm1_44.u_devicefifo.reqfifo.gen_normal_fifo.fifo_wptr + 2'b1 &&
         top_level_upec.top_earlgrey_1.u_xbar_main.u_sm1_44.u_devicefifo.rspfifo.gen_normal_fifo.fifo_rptr   != top_level_upec.top_earlgrey_1.u_xbar_main.u_sm1_44.u_devicefifo.rspfifo.gen_normal_fifo.fifo_wptr + 2'b1 &&
         top_level_upec.top_earlgrey_1.u_xbar_main.u_sm1_45.u_devicefifo.reqfifo.gen_normal_fifo.fifo_rptr   != top_level_upec.top_earlgrey_1.u_xbar_main.u_sm1_45.u_devicefifo.reqfifo.gen_normal_fifo.fifo_wptr + 2'b1 &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_sm1_45.u_devicefifo.rspfifo.gen_normal_fifo.fifo_rptr   != top_level_upec.top_earlgrey_1.u_xbar_main.u_sm1_45.u_devicefifo.rspfifo.gen_normal_fifo.fifo_wptr + 2'b1
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_sm1_45.u_devicefifo.rspfifo.gen_normal_fifo.fifo_rptr   != top_level_upec.top_earlgrey_1.u_xbar_main.u_sm1_45.u_devicefifo.rspfifo.gen_normal_fifo.fifo_wptr + 2'b1 &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.fifo_rptr         != top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.fifo_wptr + 2'h1       &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.fifo_rptr         != top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.fifo_wptr + 2'h2       &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.fifo_rptr         != top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.fifo_wptr + 2'h3
     );
 endfunction
 
@@ -147,14 +357,20 @@ function automatic debug_module_has_been_off_xbar_main();
         top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.num_req_outstanding  == 9'h000       &&
         top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.num_req_outstanding  == 9'h000       &&
         top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.fifo_h.reqfifo.gen_normal_fifo.empty &&
-        top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.fifo_h.reqfifo.gen_normal_fifo.empty
+        top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.fifo_h.reqfifo.gen_normal_fifo.empty &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.empty &&
+        top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.empty
     );
 endfunction
 
 function automatic no_outstanding_reqs_to_untrusted_device_xbar_main();
     no_outstanding_reqs_to_untrusted_device_xbar_main = (
         top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_30.dev_select_outstanding           != 6'h14        &&
-        top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.dev_select_outstanding           != 6'h14
+        top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_30.dev_select_outstanding           != 6'h14        &&
+       (top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.dev_select_outstanding           != 6'h13        &&
+        top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.dev_select_outstanding           != 6'h13        ||
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.num_req_outstanding              == '0           &&
+        top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.num_req_outstanding              == '0)
     );
 endfunction
 
@@ -171,6 +387,65 @@ function automatic security_enabled_xbar_main();
     security_enabled_xbar_main = (
         top_level_upec.top_earlgrey_1.u_xbar_main.master_bits_i == 1'b0 &&
         top_level_upec.top_earlgrey_1.u_xbar_main.slave_bits_i  == 19'h7fffe
+    );
+endfunction
+
+function automatic untrusted_slave_valid_input_equivalence_xbar_main();
+    untrusted_slave_valid_input_equivalence_xbar_main = (
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_s_i.d_valid  == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_s_i.d_valid   &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_s_i.d_opcode == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_s_i.d_opcode  &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_s_i.d_param  == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_s_i.d_param   &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_s_i.d_size   == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_s_i.d_size    &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_s_i.d_source == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_s_i.d_source  &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_s_i.d_sink   == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_s_i.d_sink    &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_s_i.d_data   == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_s_i.d_data    &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_s_i.d_user   == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_s_i.d_user    &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_s_i.d_error  == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_s_i.d_error
+    );
+endfunction
+
+function automatic untrusted_slave_ready_input_equivalence_xbar_main();
+    untrusted_slave_ready_input_equivalence_xbar_main = (
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_s_i.a_ready  == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_s_i.a_ready
+    );
+endfunction
+
+function automatic untrusted_slave_input_equivalence_xbar_main();
+    untrusted_slave_input_equivalence_xbar_main = (
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_s_i  == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_s_i
+    );
+endfunction
+
+function automatic untrusted_master_valid_input_equivalence_xbar_main();
+    untrusted_master_valid_input_equivalence_xbar_main = (
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_m_i.a_valid      == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_m_i.a_valid   &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_m_i.a_opcode     == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_m_i.a_opcode  &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_m_i.a_param      == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_m_i.a_param   &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_m_i.a_size       == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_m_i.a_size    &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_m_i.a_source     == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_m_i.a_source  &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_m_i.a_address    == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_m_i.a_address &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_m_i.a_mask       == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_m_i.a_mask    &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_m_i.a_data       == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_m_i.a_data    &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_m_i.a_user       == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_m_i.a_user
+    );
+endfunction
+
+function automatic untrusted_master_ready_input_equivalence_xbar_main();
+    untrusted_master_ready_input_equivalence_xbar_main = (
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_m_i.d_ready  == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_m_i.d_ready
+    );
+endfunction
+
+function automatic untrusted_master_input_equivalence_xbar_main();
+    untrusted_master_input_equivalence_xbar_main = (
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_m_i  == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_m_i
+    );
+endfunction
+
+function automatic untrusted_input_equivalence_xbar_main();
+    untrusted_input_equivalence_xbar_main = (
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_m_i  == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_m_i   &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.tl_untrusted_s_i  == top_level_upec.top_earlgrey_2.u_xbar_main.tl_untrusted_s_i
     );
 endfunction
 
@@ -236,13 +511,6 @@ function automatic output_equivalence_xbar_main();
         top_level_upec.top_earlgrey_1.u_xbar_main.tl_keymgr_o                   == top_level_upec.top_earlgrey_2.u_xbar_main.tl_keymgr_o                    &&
         top_level_upec.top_earlgrey_1.u_xbar_main.tl_sram_ctrl_main_o           == top_level_upec.top_earlgrey_2.u_xbar_main.tl_sram_ctrl_main_o            &&
         top_level_upec.top_earlgrey_1.u_xbar_main.tl_bus_ctrl_o                 == top_level_upec.top_earlgrey_2.u_xbar_main.tl_bus_ctrl_o
-    );
-endfunction
-
-function automatic core_output_equivalence_xbar_main();
-    core_output_equivalence_xbar_main = (
-        top_level_upec.top_earlgrey_1.u_xbar_main.tl_corei_o    == top_level_upec.top_earlgrey_2.u_xbar_main.tl_corei_o  &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.tl_cored_o    == top_level_upec.top_earlgrey_2.u_xbar_main.tl_cored_o
     );
 endfunction
 
@@ -318,6 +586,10 @@ function automatic micro_soc_state_equivalence_xbar_main();
         top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.under_rst                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.under_rst                                                          &&
         top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.num_req_outstanding                                                                              == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.num_req_outstanding                                                                               &&
         top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.dev_select_outstanding                                                                           == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.dev_select_outstanding                                                                            &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.fifo_rptr                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.fifo_rptr                                                          &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.fifo_wptr                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.fifo_wptr                                                          &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.storage                                                           == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.storage                                                            &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.under_rst                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.under_rst                                                          &&
         top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.err_resp.err_opcode                                                                              == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.err_resp.err_opcode                                                                               &&
         top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.err_resp.err_req_pending                                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.err_resp.err_req_pending                                                                          &&
         top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.err_resp.err_rsp_pending                                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.err_resp.err_rsp_pending                                                                          &&
@@ -474,26 +746,26 @@ function automatic soc_state_equivalence_xbar_main();
         top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_secure.rspfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o      == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_secure.rspfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o       &&
         top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_secure.rspfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o      == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_secure.rspfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o       &&
         top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_secure.rspfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o      == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_secure.rspfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o       &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_rptr_gray_q                                                               == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_rptr_gray_q                                                                &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_rptr_q                                                                    == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_rptr_q                                                                     &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_rptr_sync_q                                                               == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_rptr_sync_q                                                                &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_wptr_gray_q                                                               == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_wptr_gray_q                                                                &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_wptr_q                                                                    == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_wptr_q                                                                     &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.storage                                                                        == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.storage                                                                         &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o   == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o    &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o   == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o    &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o   == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o    &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o   == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o    &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_rptr_gray_q                                                               == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_rptr_gray_q                                                                &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_rptr_q                                                                    == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_rptr_q                                                                     &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_rptr_sync_q                                                               == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_rptr_sync_q                                                                &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_wptr_gray_q                                                               == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_wptr_gray_q                                                                &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_wptr_q                                                                    == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_wptr_q                                                                     &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.storage                                                                        == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.storage                                                                         &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o   == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o    &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o   == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o    &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o   == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o    &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o   == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o    &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_rptr_gray_q                                                               == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_rptr_gray_q                                                                &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_rptr_q                                                                    == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_rptr_q                                                                     &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_rptr_sync_q                                                               == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_rptr_sync_q                                                                &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_wptr_gray_q                                                               == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_wptr_gray_q                                                                &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_wptr_q                                                                    == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.fifo_wptr_q                                                                     &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.storage                                                                        == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.storage                                                                         &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o   == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o    &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o   == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o    &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o   == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o    &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.reqfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o   == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.reqfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o    &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_rptr_gray_q                                                               == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_rptr_gray_q                                                                &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_rptr_q                                                                    == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_rptr_q                                                                     &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_rptr_sync_q                                                               == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_rptr_sync_q                                                                &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_wptr_gray_q                                                               == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_wptr_gray_q                                                                &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_wptr_q                                                                    == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.fifo_wptr_q                                                                     &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.storage                                                                        == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.storage                                                                         &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o   == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o    &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o   == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.sync_rptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o    &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o   == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_1.gen_generic.u_impl_generic.q_o    &&      //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_asf_32_untrusted.rspfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o   == top_level_upec.top_earlgrey_2.u_xbar_main.u_asf_32_untrusted.rspfifo.sync_wptr.gen_generic.u_impl_generic.u_sync_2.gen_generic.u_impl_generic.q_o    &&      //
         top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_25.dev_select_outstanding                                                                           == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_25.dev_select_outstanding                                                                            &&
         top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_25.err_resp.err_opcode                                                                              == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_25.err_resp.err_opcode                                                                               &&
         top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_25.err_resp.err_req_pending                                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_25.err_resp.err_req_pending                                                                          &&
@@ -518,18 +790,22 @@ function automatic soc_state_equivalence_xbar_main();
         top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.fifo_h.reqfifo.gen_normal_fifo.fifo_wptr                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.fifo_h.reqfifo.gen_normal_fifo.fifo_wptr                                                          &&
         top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.fifo_h.reqfifo.gen_normal_fifo.storage                                                           == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.fifo_h.reqfifo.gen_normal_fifo.storage                                                            &&
         top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.fifo_h.reqfifo.gen_normal_fifo.under_rst                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.fifo_h.reqfifo.gen_normal_fifo.under_rst                                                          &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.fifo_rptr                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.fifo_rptr                                                          &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.fifo_wptr                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.fifo_wptr                                                          &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.storage                                                           == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.storage                                                            &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.fifo_rptr                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.fifo_rptr                                                          &&    //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.fifo_wptr                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.fifo_wptr                                                          &&    //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.storage                                                           == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.storage                                                            &&    //
         top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.under_rst                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.fifo_h.rspfifo.gen_normal_fifo.under_rst                                                          &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.num_req_outstanding                                                                              == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.num_req_outstanding                                                                               &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.dev_select_outstanding                                                                           == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.dev_select_outstanding                                                                            &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.err_resp.err_opcode                                                                              == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.err_resp.err_opcode                                                                               &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.err_resp.err_req_pending                                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.err_resp.err_req_pending                                                                          &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_49.num_req_outstanding                                                                              == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_49.num_req_outstanding                                                                               &&    //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.fifo_rptr                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.fifo_rptr                                                          &&    //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.fifo_wptr                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.fifo_wptr                                                          &&    //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.storage                                                           == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.storage                                                            &&    //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.under_rst                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.fifo_h.rspfifo.gen_normal_fifo.under_rst                                                          &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.dev_select_outstanding                                                                           == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.dev_select_outstanding                                                                            &&    //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.err_resp.err_opcode                                                                              == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.err_resp.err_opcode                                                                               &&    //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.err_resp.err_req_pending                                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.err_resp.err_req_pending                                                                          &&    //
         top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.err_resp.err_rsp_pending                                                                         == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.err_resp.err_rsp_pending                                                                          &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.err_resp.err_size                                                                                == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.err_resp.err_size                                                                                 &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.err_resp.err_source                                                                              == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.err_resp.err_source                                                                               &&
-        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.num_req_outstanding                                                                              == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.num_req_outstanding                                                                               &&
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.err_resp.err_size                                                                                == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.err_resp.err_size                                                                                 &&    //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.err_resp.err_source                                                                              == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.err_resp.err_source                                                                               &&    //
+        top_level_upec.top_earlgrey_1.u_xbar_main.u_s1n_50.num_req_outstanding                                                                              == top_level_upec.top_earlgrey_2.u_xbar_main.u_s1n_50.num_req_outstanding                                                                               &&    //
         top_level_upec.top_earlgrey_1.u_xbar_main.u_sm1_26.gen_arb_ppc.u_reqarb.gen_normal_case.mask                                                        == top_level_upec.top_earlgrey_2.u_xbar_main.u_sm1_26.gen_arb_ppc.u_reqarb.gen_normal_case.mask                                                         &&
         top_level_upec.top_earlgrey_1.u_xbar_main.u_sm1_27.gen_arb_ppc.u_reqarb.gen_normal_case.mask                                                        == top_level_upec.top_earlgrey_2.u_xbar_main.u_sm1_27.gen_arb_ppc.u_reqarb.gen_normal_case.mask                                                         &&
         top_level_upec.top_earlgrey_1.u_xbar_main.u_sm1_27.u_devicefifo.reqfifo.gen_normal_fifo.fifo_rptr                                                   == top_level_upec.top_earlgrey_2.u_xbar_main.u_sm1_27.u_devicefifo.reqfifo.gen_normal_fifo.fifo_rptr                                                    &&

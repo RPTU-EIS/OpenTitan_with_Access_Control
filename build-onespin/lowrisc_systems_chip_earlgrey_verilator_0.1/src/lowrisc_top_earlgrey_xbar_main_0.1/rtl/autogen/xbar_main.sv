@@ -1443,9 +1443,10 @@ end
   );
   tlul_socket_1n #(
     .HReqDepth (4'h0),
-    .HRspDepth (4'h0),
+    .HRspDepth (4'h4),
     .DReqDepth (64'h0),
     .DRspDepth (64'h0),
+    .PreventOverwhelming (1'b1),
     .N         (16)
   ) u_s1n_50 (
     .clk_i        (clk_main_i),

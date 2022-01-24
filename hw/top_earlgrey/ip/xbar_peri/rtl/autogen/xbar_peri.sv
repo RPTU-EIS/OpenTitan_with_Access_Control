@@ -154,7 +154,7 @@ module xbar_peri (
         tl_s1n_30_ds_h2d[i].a_user            = tl_s1n_30_secure_ds_h2d[i].a_user;
         tl_s1n_30_secure_ds_d2h[i].a_ready    = tl_s1n_30_ds_d2h[i].a_ready;
         tl_s1n_30_untrusted_ds_d2h[i].a_ready = 1'b0;
-      end else begin
+      end else if (tl_s1n_30_untrusted_ds_h2d[i].a_valid) begin
         tl_s1n_30_ds_h2d[i].a_valid           = tl_s1n_30_untrusted_ds_h2d[i].a_valid;
         tl_s1n_30_ds_h2d[i].a_opcode          = tl_s1n_30_untrusted_ds_h2d[i].a_opcode;
         tl_s1n_30_ds_h2d[i].a_param           = tl_s1n_30_untrusted_ds_h2d[i].a_param;
@@ -166,21 +166,76 @@ module xbar_peri (
         tl_s1n_30_ds_h2d[i].a_user            = tl_s1n_30_untrusted_ds_h2d[i].a_user;
         tl_s1n_30_untrusted_ds_d2h[i].a_ready = tl_s1n_30_ds_d2h[i].a_ready;
         tl_s1n_30_secure_ds_d2h[i].a_ready    = 1'b0;
+      end else begin
+        tl_s1n_30_ds_h2d[i].a_valid           = '0;
+        tl_s1n_30_ds_h2d[i].a_opcode          = '0;
+        tl_s1n_30_ds_h2d[i].a_param           = '0;
+        tl_s1n_30_ds_h2d[i].a_size            = '0;
+        tl_s1n_30_ds_h2d[i].a_source          = '0;
+        tl_s1n_30_ds_h2d[i].a_address         = '0;
+        tl_s1n_30_ds_h2d[i].a_mask            = '0;
+        tl_s1n_30_ds_h2d[i].a_data            = '0;
+        tl_s1n_30_ds_h2d[i].a_user            = '0;
+        tl_s1n_30_untrusted_ds_d2h[i].a_ready = 1'b0;
+        tl_s1n_30_secure_ds_d2h[i].a_ready    = 1'b0;
       end
     end
 
     always_comb begin
-      if (tl_s1n_30_ds_d2h[i].d_source[0]) begin
-        tl_s1n_30_secure_ds_d2h[i].d_valid      = tl_s1n_30_ds_d2h[i].d_valid;
-        tl_s1n_30_secure_ds_d2h[i].d_opcode     = tl_s1n_30_ds_d2h[i].d_opcode;
-        tl_s1n_30_secure_ds_d2h[i].d_param      = tl_s1n_30_ds_d2h[i].d_param;
-        tl_s1n_30_secure_ds_d2h[i].d_size       = tl_s1n_30_ds_d2h[i].d_size;
-        tl_s1n_30_secure_ds_d2h[i].d_source     = {1'b0, tl_s1n_30_ds_d2h[i].d_source[7:1]};
-        tl_s1n_30_secure_ds_d2h[i].d_sink       = tl_s1n_30_ds_d2h[i].d_sink;
-        tl_s1n_30_secure_ds_d2h[i].d_data       = tl_s1n_30_ds_d2h[i].d_data;
-        tl_s1n_30_secure_ds_d2h[i].d_user       = tl_s1n_30_ds_d2h[i].d_user;
-        tl_s1n_30_secure_ds_d2h[i].d_error      = tl_s1n_30_ds_d2h[i].d_error;
-        tl_s1n_30_ds_h2d[i].d_ready             = tl_s1n_30_secure_ds_h2d[i].d_ready;
+      if (tl_s1n_30_ds_d2h[i].d_valid) begin
+        if (tl_s1n_30_ds_d2h[i].d_source[0]) begin
+          tl_s1n_30_secure_ds_d2h[i].d_valid      = tl_s1n_30_ds_d2h[i].d_valid;
+          tl_s1n_30_secure_ds_d2h[i].d_opcode     = tl_s1n_30_ds_d2h[i].d_opcode;
+          tl_s1n_30_secure_ds_d2h[i].d_param      = tl_s1n_30_ds_d2h[i].d_param;
+          tl_s1n_30_secure_ds_d2h[i].d_size       = tl_s1n_30_ds_d2h[i].d_size;
+          tl_s1n_30_secure_ds_d2h[i].d_source     = {1'b0, tl_s1n_30_ds_d2h[i].d_source[7:1]};
+          tl_s1n_30_secure_ds_d2h[i].d_sink       = tl_s1n_30_ds_d2h[i].d_sink;
+          tl_s1n_30_secure_ds_d2h[i].d_data       = tl_s1n_30_ds_d2h[i].d_data;
+          tl_s1n_30_secure_ds_d2h[i].d_user       = tl_s1n_30_ds_d2h[i].d_user;
+          tl_s1n_30_secure_ds_d2h[i].d_error      = tl_s1n_30_ds_d2h[i].d_error;
+          tl_s1n_30_ds_h2d[i].d_ready             = tl_s1n_30_secure_ds_h2d[i].d_ready;
+  
+          tl_s1n_30_untrusted_ds_d2h[i].d_valid   = '0;
+          tl_s1n_30_untrusted_ds_d2h[i].d_opcode  = '0;
+          tl_s1n_30_untrusted_ds_d2h[i].d_param   = '0;
+          tl_s1n_30_untrusted_ds_d2h[i].d_size    = '0;
+          tl_s1n_30_untrusted_ds_d2h[i].d_source  = '0;
+          tl_s1n_30_untrusted_ds_d2h[i].d_sink    = '0;
+          tl_s1n_30_untrusted_ds_d2h[i].d_data    = '0;
+          tl_s1n_30_untrusted_ds_d2h[i].d_user    = '0;
+          tl_s1n_30_untrusted_ds_d2h[i].d_error   = '0;
+        end else begin
+          tl_s1n_30_untrusted_ds_d2h[i].d_valid   = tl_s1n_30_ds_d2h[i].d_valid;
+          tl_s1n_30_untrusted_ds_d2h[i].d_opcode  = tl_s1n_30_ds_d2h[i].d_opcode;
+          tl_s1n_30_untrusted_ds_d2h[i].d_param   = tl_s1n_30_ds_d2h[i].d_param;
+          tl_s1n_30_untrusted_ds_d2h[i].d_size    = tl_s1n_30_ds_d2h[i].d_size;
+          tl_s1n_30_untrusted_ds_d2h[i].d_source  = {1'b0, tl_s1n_30_ds_d2h[i].d_source[7:1]};
+          tl_s1n_30_untrusted_ds_d2h[i].d_sink    = tl_s1n_30_ds_d2h[i].d_sink;
+          tl_s1n_30_untrusted_ds_d2h[i].d_data    = tl_s1n_30_ds_d2h[i].d_data;
+          tl_s1n_30_untrusted_ds_d2h[i].d_user    = tl_s1n_30_ds_d2h[i].d_user;
+          tl_s1n_30_untrusted_ds_d2h[i].d_error   = tl_s1n_30_ds_d2h[i].d_error;
+          tl_s1n_30_ds_h2d[i].d_ready             = tl_s1n_30_untrusted_ds_h2d[i].d_ready;
+  
+          tl_s1n_30_secure_ds_d2h[i].d_valid      = '0;
+          tl_s1n_30_secure_ds_d2h[i].d_opcode     = '0;
+          tl_s1n_30_secure_ds_d2h[i].d_param      = '0;
+          tl_s1n_30_secure_ds_d2h[i].d_size       = '0;
+          tl_s1n_30_secure_ds_d2h[i].d_source     = '0;
+          tl_s1n_30_secure_ds_d2h[i].d_sink       = '0;
+          tl_s1n_30_secure_ds_d2h[i].d_data       = '0;
+          tl_s1n_30_secure_ds_d2h[i].d_user       = '0;
+          tl_s1n_30_secure_ds_d2h[i].d_error      = '0;
+        end
+      end else begin
+        tl_s1n_30_secure_ds_d2h[i].d_valid      = '0;
+        tl_s1n_30_secure_ds_d2h[i].d_opcode     = '0;
+        tl_s1n_30_secure_ds_d2h[i].d_param      = '0;
+        tl_s1n_30_secure_ds_d2h[i].d_size       = '0;
+        tl_s1n_30_secure_ds_d2h[i].d_source     = '0;
+        tl_s1n_30_secure_ds_d2h[i].d_sink       = '0;
+        tl_s1n_30_secure_ds_d2h[i].d_data       = '0;
+        tl_s1n_30_secure_ds_d2h[i].d_user       = '0;
+        tl_s1n_30_secure_ds_d2h[i].d_error      = '0;
 
         tl_s1n_30_untrusted_ds_d2h[i].d_valid   = '0;
         tl_s1n_30_untrusted_ds_d2h[i].d_opcode  = '0;
@@ -192,28 +247,8 @@ module xbar_peri (
         tl_s1n_30_untrusted_ds_d2h[i].d_user    = '0;
         tl_s1n_30_untrusted_ds_d2h[i].d_error   = '0;
 
-      end else begin
-        tl_s1n_30_untrusted_ds_d2h[i].d_valid   = tl_s1n_30_ds_d2h[i].d_valid;
-        tl_s1n_30_untrusted_ds_d2h[i].d_opcode  = tl_s1n_30_ds_d2h[i].d_opcode;
-        tl_s1n_30_untrusted_ds_d2h[i].d_param   = tl_s1n_30_ds_d2h[i].d_param;
-        tl_s1n_30_untrusted_ds_d2h[i].d_size    = tl_s1n_30_ds_d2h[i].d_size;
-        tl_s1n_30_untrusted_ds_d2h[i].d_source  = {1'b0, tl_s1n_30_ds_d2h[i].d_source[7:1]};
-        tl_s1n_30_untrusted_ds_d2h[i].d_sink    = tl_s1n_30_ds_d2h[i].d_sink;
-        tl_s1n_30_untrusted_ds_d2h[i].d_data    = tl_s1n_30_ds_d2h[i].d_data;
-        tl_s1n_30_untrusted_ds_d2h[i].d_user    = tl_s1n_30_ds_d2h[i].d_user;
-        tl_s1n_30_untrusted_ds_d2h[i].d_error   = tl_s1n_30_ds_d2h[i].d_error;
-        tl_s1n_30_ds_h2d[i].d_ready             = tl_s1n_30_untrusted_ds_h2d[i].d_ready;
-
-        tl_s1n_30_secure_ds_d2h[i].d_valid      = '0;
-        tl_s1n_30_secure_ds_d2h[i].d_opcode     = '0;
-        tl_s1n_30_secure_ds_d2h[i].d_param      = '0;
-        tl_s1n_30_secure_ds_d2h[i].d_size       = '0;
-        tl_s1n_30_secure_ds_d2h[i].d_source     = '0;
-        tl_s1n_30_secure_ds_d2h[i].d_sink       = '0;
-        tl_s1n_30_secure_ds_d2h[i].d_data       = '0;
-        tl_s1n_30_secure_ds_d2h[i].d_user       = '0;
-        tl_s1n_30_secure_ds_d2h[i].d_error      = '0;
-      end
+        tl_s1n_30_ds_h2d[i].d_ready             = 1'b0;
+      end    
     end
   end
 
