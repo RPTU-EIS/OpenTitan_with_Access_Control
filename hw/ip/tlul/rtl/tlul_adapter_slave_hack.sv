@@ -136,12 +136,12 @@ module tlul_adapter_slave
     end
     EXTRA_RESPONSE: begin
       gnt_o = '1;
-      tl_o_fifo.d_valid = req_i && (addr_i == MASTER_ADDRESS);
+      tl_o_fifo.d_valid = 1'b1;
       tl_o_fifo.d_opcode = (we_i) ? tlul_pkg::AccessAckData : tlul_pkg::AccessAck;
       tl_o_fifo.d_size = 2'h2;
       tl_o_fifo.d_source = source;
       tl_o_fifo.d_data = wdata_i & mask;
-      next_state = (response_sent) ? ACK_RESPONSE : EXTRA_RESPONSE;
+      next_state = tl_i.d_ready ? ACK_RESPONSE : EXTRA_RESPONSE;
     end
     ACK_RESPONSE: begin
       valid_o = '1;
