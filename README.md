@@ -2,6 +2,30 @@
 
 ![OpenTitan logo](https://docs.opentitan.org/doc/opentitan-logo.png)
 
+
+## Regarding UPEC-OI
+
+This is a copy of the original OpenTitan repo which can be found [here](https://github.com/lowRISC/opentitan).
+This repo contains a modified OpenTitan
+HW design with a primitive SoC-level access control mechanism, as well as added
+dummy components which model malicious IPs. Several scripts were added to help the
+verification process:
+1) open_earlgrey_upec.tcl can be used to load a miter model of the design into
+OneSpin and run the property check.
+2) rerun_earlgrey_upec.tcl can rerun a property check on an already loaded HW model.
+3) extract_signal_sva.tcl can extract all state signals from the miter model, which
+is useful when constructing the UPEC-OI property macros.
+
+The RTL files for the design are located in the hw folder. These are the files used
+by the Verilator simulation environment. However, OneSpin loads RTL files from the
+build-onespin/lowrisc_systems_chip_earlgrey_verilator_0.1/src directory, due to a
+nicer folder structure there. Therefore, when modifying an RTL file, first change
+it in the hw folder, confirm design functionality with simulation, and then replace
+the corresponding file in the build-onespin directory. The new design can then be
+loaded into OneSpin for formal verification.
+
+The already existing UPEC-OI verification files are in the hw/upec/ directory.
+
 ## About the project
 
 [OpenTitan](https://opentitan.org) is an open source silicon Root of Trust
@@ -35,26 +59,3 @@ for guidelines on how to contribute code to this repository.
 
 Unless otherwise noted, everything in this repository is covered by the Apache
 License, Version 2.0 (see [LICENSE](./LICENSE) for full text).
-
-## Regarding UPEC-OI
-
-This is a copy of the original OpenTitan repo which can be found [here](https://github.com/lowRISC/opentitan).
-This repo contains a modified OpenTitan
-HW design with a primitive SoC-level access control mechanism, as well as added
-dummy components which model malicious IPs. Several scripts were added to help the
-verification process:
-1) open_earlgrey_upec.tcl can be used to load a miter model of the design into
-OneSpin and run the property check.
-2) rerun_earlgrey_upec.tcl can rerun a property check on an already loaded HW model.
-3) extract_signal_sva.tcl can extract all state signals from the miter model, which
-is useful when constructing the UPEC-OI property macros.
-
-The RTL files for the design are located in the hw folder. These are the files used
-by the Verilator simulation environment. However, OneSpin loads RTL files from the
-build-onespin/lowrisc_systems_chip_earlgrey_verilator_0.1/src directory, due to a
-nicer folder structure there. Therefore, when modifying an RTL file, first change
-it in the hw folder, confirm design functionality with simulation, and then replace
-the corresponding file in the build-onespin directory. The new design can then be
-loaded into OneSpin for formal verification.
-
-The already existing UPEC-OI verification files are in the hw/upec/ directory.
