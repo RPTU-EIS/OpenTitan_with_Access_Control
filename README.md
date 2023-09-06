@@ -7,18 +7,16 @@
 
 This is a copy of the original OpenTitan repo which can be found [here](https://github.com/lowRISC/opentitan).
 This repo contains a modified OpenTitan
-HW design with a primitive SoC-level access control mechanism, as well as added
-dummy components which model malicious IPs. Several scripts were added to help the
+HW design with a primitive SoC-level access control mechanism, as well as an added IP to model an untrusted device. This component is another Ibex core which has both master and slave access to the SoC interconnect. The following scripts were added to help the
 verification process:
 1) open_earlgrey_upec.tcl can be used to load a miter model of the design into
 the OneSpin 360 DV formal verification tool and run the property check.
-2) rerun_earlgrey_upec.tcl can rerun a property check on an already loaded HW model.
+2) rerun_earlgrey_upec.tcl is a truncated version of (1) that can rerun a property check on an already loaded HW model.
 3) extract_signal_sva.tcl can extract all state signals from the miter model, which
 is useful when constructing the UPEC-OI property macros.
 
 The RTL files for the design are located in the hw folder. These are the files used
-by the Verilator simulation environment. However, OneSpin loads RTL files from the
-build-onespin/lowrisc_systems_chip_earlgrey_verilator_0.1/src directory, due to a
+by OpenTitan's preferred Verilator simulation environment. However, OneSpin loads RTL files from the build-onespin/lowrisc_systems_chip_earlgrey_verilator_0.1/src directory, due to a
 nicer folder structure there. Therefore, when modifying an RTL file, first change
 it in the hw folder, verify design functionality with simulation or by other means, and then replace
 the corresponding file in the build-onespin directory. The new design can then be
