@@ -22,7 +22,7 @@ it in the hw folder, verify design functionality with simulation or by other mea
 the corresponding file in the build-onespin directory. The new design can then be
 loaded into OneSpin for formal verification.
 
-The already existing UPEC-OI verification files are in the directory hw/upec/. The UPEC-OI verification methodology is elaborated in the accompanied paper [here](https://www.usenix.org/system/files/usenixsecurity23-mehmedagic.pdf).
+The already existing UPEC-OI verification files are in the directory hw/upec/. The UPEC-OI verification methodology is elaborated in the accompanying [paper](https://www.usenix.org/system/files/usenixsecurity23-mehmedagic.pdf).
 
 ## Setting up the Verilator environment
 
